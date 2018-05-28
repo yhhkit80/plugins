@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+
+		<title>Tree Example</title>
+		<link rel="stylesheet" href="css/D3BinaryTree.css" />
+
+		<style>
+			html,
+			body {
+				height: 100%
+			}
+			
+		</style>
+
+	</head>
+
+	<body>
+		<!--左右布局 start 父容器(此处为body)必须有高度-->
+
+		<!--左 start-->
+		<div class="leftContainer">
+			<!--左边规则列表-->
+			<div class="rulesContainer">
+				<ul>
+					<!--<li>
+						<div id="a" class="drag" draggable="true" data-type="RULE" data-class="WarnAddress">拖规则一</div>
+					</li>
+					<li>
+						<div id="b" class="drag" draggable="true" data-type="RULE" data-class="RULE002">拖规则二</div>
+					</li>
+					<li>
+						<div id="c" class="drag" draggable="true" data-type="RULE" data-class="RULE003">拖规则三</div>
+					</li>
+					<li>
+						<div id="d" class="drag" draggable="true" data-type="TERMINAL" data-class="HIGH">拖结果一</div>
+					</li>
+					<li>
+						<div id="e" class="drag" draggable="true" data-type="TERMINAL" data-class="MIDDLE">拖结果二</div>
+					</li>-->
+				</ul>
+			</div>
+		</div>
+		<!--左 end -->
+
+		<!--右 start -->
+		<div class="rightContainer">
+			<!--svg上方操作按钮-->
+			<div class="svgBtnContainer">
+				<!--<a id="getSvgDataBtn" class="button">取值</a>
+				<a id="clearSvgDataBtn" class="button">清空</a>
+				<a id="restoreSvgDataBtn" class="button">初始数据</a>
+				<a id="restoreSvgSizeBtn" class="button">1:1</a>-->
+			</div>
+			<!--svg容器-->
+			<div id="svgContainer" class="er-btsvg-container"></div>
+		</div>
+		<!--右 end -->
+
+		<!--左右布局 end -->
+
+		<!--弹窗中的规则编辑表单,规则逻辑中动态生成er-input-row，其余直接赋值-->
+		<form id="layForm" style="display: none;padding: 15px 0;" class="er-form er-border">
+			<input type="hidden" name="ruleClass" value="">
+			<div class="er-form-group"><label class="er-label">规则名称：</label>
+				<div class="er-input-content"><input readonly="readonly" class="er-form-text" name="ruleTitle" value="拖规则一" style="width:432px;"></div>
+			</div>
+			<div class="er-row">
+				<div class="er-col-half er-form-group">
+					<label class="er-label">权重：</label>
+					<div class="er-input-content">
+						<input class="er-form-control" name="weight" placeholder="请输入" style="width:60px;" autocomplete="off"> %
+					</div>
+				</div>
+				<div class="er-col-half er-form-group"><label class="er-label">规则状态：</label>
+					<div class="er-input-content">
+						<span class="er-form-text">启用</span>
+					</div>
+				</div>
+			</div>
+			<div class="er-form-group"><label class="er-label">规则逻辑：</label>
+				<div class="er-input-content" id="argsContent">
+					<div class="er-input-row">
+						<input class="er-form-control" disabled name="left">
+						<input class="er-form-control" readonly name="oper" style="width:60px;text-align:center;">
+						<div class="er-select" name="right"></div>
+					</div>
+				</div>
+			</div>
+			<div class="er-form-group error-tip-row"><span class="error-tip" id="errorTip"></span></div>
+			<div class="er-btnrow">
+				<a id="layWindowCancel" class="button button-default">取消</a>
+				<a id="layWindowConfirm" class="button">确认</a>
+			</div>
+		</form>
+
+		<!-- load the d3.js library -->
+		<!--<script src="http://d3js.org/d3.v3.min.js"></script>-->
+		<script src="js/d3.v3.min.js"></script>
+		<script src="js/jquery-2.2.1.min.js" type="text/javascript" charset="utf-8"></script>
+		<script src="js/smartMenu.js" type="text/javascript" charset="utf-8"></script>
+		<script src="js/layer/layer.js"></script>
+		<script src="js/erselect.js"></script>
+		<script src="js/d3BinaryTree.js" type="text/javascript" charset="utf-8"></script>
+
+		<script>
+			var rulelist = {
+				"com.godsuy.mogo.bigdata.ruleengine.rule.RestAddressDegree": {
+					"ruleDescribe": "",
+					"ruleTitle": "居住地址真实程度",
+					"argument": [{
+						"left": "居住地址可信程度",
+						"oper": ">",
+						"right": 0.8
+					}],
+					"ruleType": "PERSONALINFO"
+				},
+				"com.godsuy.mogo.bigdata.ruleengine.rule.WarnAddress": {
+					"ruleDescribe": "",
+					"ruleTitle": "申请人地址高危",
+					"argument": [{
+						"left": "高危地址为",
+						"oper": "in",
+						"right": [
+							"红寺堡",
+							"彭阳",
+							"固原",
+							"同心",
+							"海原",
+							"西吉"
+						]
+					}],
+					"ruleType": "GROUPFRAUD"
+				},
+				"com.godsuy.mogo.bigdata.ruleengine.rule.MainMobileUnit": {
+					"ruleDescribe": "",
+					"ruleTitle": "申请人社交圈与工作地不匹配",
+					"argument": [{
+							"left": "居住时段居住地址偏移量",
+							"optional": [
+								"(0,2)",
+								"(2,5)",
+								"(5,+)"
+							],
+							"oper": "=",
+							"right": "(0,2)"
+						},
+						{
+							"left": "工作地址和居住地址相距",
+							"oper": ">",
+							"right": "40"
+						}
+					],
+					"ruleType": "PERSONALINFO"
+				},
+				"com.godsuy.mogo.bigdata.ruleengine.rule.RealContact": {
+					"ruleDescribe": "",
+					"ruleTitle": "订单联系人验真",
+					"argument": [{
+						"left": "异常联系人占比",
+						"oper": ">",
+						"right": 0.5
+					}],
+					"ruleType": "CONTACTINFO"
+				},
+				"com.godsuy.mogo.bigdata.ruleengine.rule.WorkAddressDegree": {
+					"ruleDescribe": "",
+					"argument": [{
+						"left": "工作地址可信程度",
+						"oper": ">",
+						"right": 0.8
+					}],
+					"ruleType": "PERSONALINFO",
+					"ruleTitle": "工作地址真实程度"
+				}
+			}
+			var results = [{
+				"ruleTitle": "高风险",
+				"ruleType": "HIGH"
+			}, {
+				"ruleTitle": "中风险",
+				"ruleType": "MIDDLE"
+			}, {
+				"ruleTitle": "低风险",
+				"ruleType": "LOW"
+			}];
+			//渲染规则列表
+			$(function() {
+				var ruleBox = $('.rulesContainer ul');
+				ruleBox.html('');
+				$.each(rulelist, function(key, rule) {
+					var ruleData = $.extend(true, {}, rule);
+					ruleData.type = "RULE";
+					ruleData.ruleClass = key;
+					var $li = $('<li></li>').appendTo(ruleBox);
+					var $rule = $('<div class="drag" draggable="true">' + ruleData.ruleTitle + '</div>').data('ruleData', ruleData).appendTo($li);
+				});
+				$.each(results, function(key, res) {
+					var resData = $.extend(true, {}, res);
+					resData.type = "TERMINAL";
+					resData.ruleClass = resData.ruleType;
+					var $li = $('<li></li>').appendTo(ruleBox);
+					var $rule = $('<div class="drag" draggable="true">' + resData.ruleTitle + '</div>').data('ruleData', resData).appendTo($li);
+				});
+				$('.drag', ruleBox).on({
+					dragstart: function(e) {
+						//需要传递三个参数 ruleTitle,type,ruleClass
+						var ruleData = $(e.target).data('ruleData');
+						var objstr = JSON.stringify(ruleData);
+						e.originalEvent.dataTransfer.setData("text", objstr);
+					}
+				});
+
+				//模型测试数据
+				var jsondata = [{
+					"ruleTitle": "申请人地址高危",
+					"ruleClass": "WarnAddress_A",
+					"enable": true,
+					"attachData": {
+						"autoId": "1",
+						"isHit": true,
+						"type": "RULE",
+						"relation": {
+							"parent": {
+								"value": "0",
+								"class": null,
+								"type": null
+							},
+							"hitBranch": {
+								"value": "HIGH",
+								"type": "TERMINAL"
+							},
+							"unHitBranch": {
+								"value": "2",
+								"class": "MainMobileUnit_A",
+								"type": "RULE"
+							}
+						}
+					},
+					"argument": [{
+						"left": "高危地址",
+						"oper": "in",
+						"right": "红寺堡,彭阳,固原,同心,海原,西吉"
+					}]
+				}, {
+					"ruleTitle": "申请人社交圈与工作地不匹配",
+					"enable": true,
+					"attachData": {
+						"autoId": "2",
+						"isHit": false,
+						"type": "RULE",
+						"relation": {
+							"parent": {
+								"value": "1",
+								"class": "WarnAddress_A",
+								"type": "RULE"
+							},
+							"hitBranch": {
+								"value": "8",
+								"class": "com.godsuy.mogo.bigdata.ruleengine.rule.WorkAddressDegree",
+								"type": "RULE"
+							},
+							"unHitBranch": {
+								"value": "3",
+								"class": "com.godsuy.mogo.bigdata.ruleengine.rule.RestAddressDegree",
+								"type": "RULE"
+							}
+						}
+					},
+					"ruleClass": "MainMobileUnit_A",
+					"argument": [{
+						"left": "休息时段居住地址偏移量",
+						"oper": "=",
+						"right": "(0,2)"
+					}, {
+						"left": "工作地址和居住地址相距",
+						"oper": ">",
+						"right": "40"
+					}]
+				}, {
+					"ruleTitle": "居住地址真实程度",
+					"ruleClass": "com.godsuy.mogo.bigdata.ruleengine.rule.RestAddressDegree",
+					"enable": true,
+					"argument": [{
+						"left": "高危地址为",
+						"oper": "in",
+						"right": "红寺堡,彭阳,固原,同心,海原,西吉"
+					}, {
+						"left": "居住时段居住地址偏移量",
+						"oper": "=",
+						"right": "(0,2)"
+					}, {
+						"left": "工作地址和居住地址相距",
+						"oper": ">",
+						"right": "40"
+					}],
+					"attachData": {
+						"autoId": "3",
+						"isHit": false,
+						"type": "RULE",
+						"weight": "10",
+						"relation": {
+							"parent": {
+								"value": "2",
+								"type": "RULE"
+							},
+							"hitBranch": {
+								"value": "6",
+								"class": "com.godsuy.mogo.bigdata.ruleengine.rule.RealContact",
+								"type": "RULE"
+							},
+							"unHitBranch": {
+								"value": "HIGH",
+								"type": "TERMINAL"
+							}
+						}
+					}
+				}, {
+					"ruleTitle": "订单联系人验真",
+					"ruleClass": "com.godsuy.mogo.bigdata.ruleengine.rule.RealContact",
+					"enable": true,
+					"argument": [{
+						"left": "高危地址为",
+						"oper": "in",
+						"right": "红寺堡,彭阳,固原,同心,海原,西吉"
+					}, {
+						"left": "居住时段居住地址偏移量",
+						"oper": "=",
+						"right": "(0,2)"
+					}, {
+						"left": "工作地址和居住地址相距",
+						"oper": ">",
+						"right": "40"
+					}],
+					"attachData": {
+						"autoId": "6",
+						"isHit": true,
+						"type": "RULE",
+						"weight": "10",
+						"relation": {
+							"parent": {
+								"value": "3",
+								"type": "RULE"
+							},
+							"hitBranch": {
+								"value": "MIDDLE",
+								"type": "TERMINAL"
+							},
+							"unHitBranch": {
+								"value": "LOW",
+								"type": "TERMINAL"
+							}
+						}
+					}
+				}, {
+					"ruleTitle": "工作地址真实程度",
+					"ruleClass": "com.godsuy.mogo.bigdata.ruleengine.rule.WorkAddressDegree",
+					"enable": true,
+					"argument": [{
+						"left": "高危地址为",
+						"oper": "in",
+						"right": "红寺堡,彭阳,固原,同心,海原,西吉"
+					}, {
+						"left": "居住时段居住地址偏移量",
+						"oper": "=",
+						"right": "(0,2)"
+					}, {
+						"left": "工作地址和居住地址相距",
+						"oper": ">",
+						"right": "40"
+					}],
+					"attachData": {
+						"autoId": "8",
+						"isHit": true,
+						"type": "RULE",
+						"weight": "10",
+						"relation": {
+							"parent": {
+								"value": "2",
+								"type": "RULE"
+							},
+							"hitBranch": {
+								"value": "9",
+								"class": "com.godsuy.mogo.bigdata.ruleengine.rule.RealContact",
+								"type": "RULE"
+							},
+							"unHitBranch": {
+								"value": "LOW",
+								"type": "TERMINAL"
+							}
+						}
+					}
+				}, {
+					"ruleTitle": "订单联系人验真",
+					"ruleClass": "com.godsuy.mogo.bigdata.ruleengine.rule.RealContact",
+					"enable": true,
+					"argument": [{
+						"left": "高危地址为",
+						"oper": "in",
+						"right": "红寺堡,彭阳,固原,同心,海原,西吉"
+					}, {
+						"left": "居住时段居住地址偏移量",
+						"oper": "=",
+						"right": "(0,2)"
+					}, {
+						"left": "工作地址和居住地址相距",
+						"oper": ">",
+						"right": "40"
+					}],
+					"attachData": {
+						"autoId": "9",
+						"isHit": true,
+						"type": "RULE",
+						"weight": "10",
+						"relation": {
+							"parent": {
+								"value": "8",
+								"type": "RULE"
+							},
+							"hitBranch": {
+								"value": "HIGH",
+								"type": "TERMINAL"
+							},
+							"unHitBranch": {
+								"value": "MIDDLE",
+								"type": "TERMINAL"
+							}
+						}
+					}
+				}];
+
+				//规则的数据
+				var demoRule = {
+					"com.godsuy.mogo.bigdata.ruleengine.rule.WarnAddress": {
+						"ruleDescribe": "",
+						"ruleTitle": "申请人地址高危",
+						"argument": [{
+								"left": "高危地址为",
+								"oper": "in",
+								"right": [
+									"红寺堡",
+									"彭阳",
+									"固原",
+									"同心",
+									"海原",
+									"西吉"
+								]
+							},
+							{
+								"left": "居住时段居住地址偏移量",
+								"optional": [
+									"(0,2)",
+									"(2,5)",
+									"(5,+)"
+								],
+								"oper": "=",
+								"right": "(0,2)"
+							},
+							{
+								"left": "工作地址和居住地址相距",
+								"oper": ">",
+								"right": "40"
+							}
+						],
+						"ruleType": "GROUPFRAUD"
+					}
+				};
+
+				//表单编辑前的事件，修改表单内容,obj为节点数据，ruleData为规则数据
+				function beforeFormOpenFn(nodeData) {
+					$('.error-tip', '#layForm').text('').hide();
+					//根据节点中的名称获取规则数据，暂时写死
+					var ruleData = demoRule["com.godsuy.mogo.bigdata.ruleengine.rule.WarnAddress"];
+					//var ruleData = getRuleData(nodeData.ruleClass);
+					nodeData.argument = nodeData.argument || [];
+					$('#layForm').data('data', nodeData); //已经变为模型中的节点数据结构
+					$('#layForm').data('ruleData', ruleData); //原始规则的数据结构
+					//#layForm赋值，修改规则参数
+					$('input[name=ruleTitle]', '#layForm').val(nodeData.ruleTitle);
+					$('input[name=ruleClass]', '#layForm').val(nodeData.ruleClass);
+					$('input[name=weight]', '#layForm').val(nodeData.attachData.weight);
+					//渲染规则逻辑，按照规则数据的具体参数
+					var argsContent = $('#argsContent');
+					argsContent.html('');
+					$.each(ruleData.argument, function(i, argu) {
+						//设置每一条规则逻辑中的默认值：如果是修改的话为节点原数据，如果是新增则是规则中的默认值
+						var nodeArgu = nodeData.argument[i],
+							leftVal = (nodeArgu && nodeArgu.left) ? 　nodeArgu.left　 : 　argu.left,
+							operVal = (nodeArgu && nodeArgu.oper) ? 　nodeArgu.oper　 : 　argu.oper,
+							rightVal = (nodeArgu && nodeArgu.right) ? 　nodeArgu.right　 : 　argu.right;
+						var row = $('<div class="er-input-row"></div>').appendTo(argsContent);
+						var left = $('<input class="er-form-control" disabled="disabled" name="left" style="width: 186px;" autocomplete="off">').appendTo(row).val(leftVal);
+						var oper = $('<input class="er-form-text" readonly name="oper" style="width:60px;text-align:center;" autocomplete="off">').appendTo(row).val(operVal);
+						if(argu.optional && argu.optional.length) {
+							var right = $('<div class="er-select" name="right"></div>').appendTo(row);
+							right.erselect({
+								multiple: false,
+								readonly: false,
+								disabled: false,
+								data: argu.optional
+							});
+							right.erselect('setValue', rightVal);
+						} else {
+							var right = $('<input class="er-form-control" name="right" placeholder="请输入" style="width: 186px;">').appendTo(row).val(rightVal);
+						}
+					});
+				}
+
+				//获取表单数据
+				function getRuleFormData() {
+					var formData = $('#layForm').serializeObject();
+					var reg = /^([1-9]\d|\d)(\.\d{1,2})?$|^100(\.[0]{1,2})?$/;
+					if(!reg.test(formData.weight)) {
+						$('.error-tip').text('错误提示：权重百分比设置不对，0-100，保留两位小数').show();
+						return false;
+					}
+					var oldObj = $('#layForm').data('data');
+					var ruleData = $('#layForm').data('ruleData');
+					//需校验权重百分比，规则逻辑生成结果（应不能重复）
+					var saveData = $.extend(true, {}, oldObj);
+					saveData.attachData.weight = formData.weight;
+					var args = [];
+					$.each($('.er-input-row', '#argsContent'), function(i, row) {
+						var rightVal = $.trim($('input[name=right]', row).val());
+						if(rightVal)
+							args.push({
+								left: $('input[name=left]', row).val(),
+								oper: $('input[name=oper]', row).val(),
+								right: rightVal
+							});
+					});
+					if(args.length != ruleData.argument.length) {
+						$('.error-tip').text('错误提示：规则逻辑未编辑完整').show();
+						return false;
+					} else $('.error-tip').text('').hide();
+					saveData.argument = args;
+					//应该再提交后台进行校验
+					return saveData;
+				}
+				//初始化二叉树
+				var tree = new D3BinaryTree({
+					container: '#svgContainer', //画布父容器
+					editContainer: '#layForm', //编辑弹窗中内容的容器
+					svgBtnContainer: '.svgBtnContainer', //操作按钮容器
+					fit: true, //是否自适应父容器宽高，true的话没有滚动条，全靠鼠标缩放，false的话有滚动条
+					nodeWidth: 80, //节点宽度
+					nodeHeight: 32, //节点高度
+					textSize: 10, //字体大小
+					gap: 20, //画布四边间距(其实只有左间距能看出来)
+					duration: 500, //过渡延迟时间
+					originalData: jsondata, //初次加载时的原始数据
+					terminalDict: {
+						'HIGH': '高',
+						'MIDDLE': '中',
+						'LOW': '低'
+					}, //风险等级字典
+					beforeFormOpen: function(nodeData) { //表单编辑前的事件，修改表单内容,obj为节点数据，ruleData为规则数据
+						beforeFormOpenFn(nodeData);
+					},
+					operBtn: [{
+						text: '取Tree值',
+						func: function() {
+							var treeData = tree.getTreeData();
+							console.log('取Tree数据值', treeData);
+						}
+					}, {
+						text: '取Modal值',
+						func: function() {
+							var modalData = tree.getModalData();
+							var completed = tree.isD3BinaryTreeCompleted(); //true为完成
+							console.log('取Modal数据值', modalData);
+						}
+					}, {
+						text: '清空',
+						func: function() {
+							tree.clear();
+						}
+					}, {
+						text: '初始数据',
+						func: function() {
+							tree.restore();
+						}
+					}, {
+						text: '1:1',
+						func: function() {
+							tree.resize();
+						}
+					}]
+				});
+				//表单中取消按钮关闭弹窗
+				$('#layWindowCancel', '#layForm').on('click', function() {
+					layer.closeAll();
+				});
+				//表单中确认按钮获取规则编辑后的数据并进行校验，通过后再保存进二叉树
+				$('#layWindowConfirm', '#layForm').on('click', function() {
+					var saveData = getRuleFormData(); //获取已校验完毕的表单数据，校验失败则取值为false
+					tree.saveNode(saveData);
+				});
+
+				//拖拽规则到正确节点事件
+				$(document).on({
+					dragleave: function(e) {
+						e.preventDefault();
+					},
+					dragenter: function(e) {
+						e.preventDefault();
+					},
+					dragover: function(e) {
+						e.preventDefault();
+					},
+					drop: function(e, data) {
+						e.preventDefault();
+						tree.todoNodeDrop(e);
+					}
+				});
+			});
+		</script>
+
+	</body>
+
+</html>

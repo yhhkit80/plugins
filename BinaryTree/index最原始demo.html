@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<style>
+			html,
+			body,
+			div,
+			a,
+			p,
+			ul,
+			li,
+			canvas {
+				margin: 0;
+				padding: 0;
+				font-size: 12px;
+				color: #333;
+			}
+			
+			ul,
+			li {
+				list-style: none;
+			}
+			
+			a {
+				text-decoration: none;
+				cursor: pointer;
+			}
+			
+			.er-row {
+				/*margin: 10px 0;*/
+				min-height: 60px;
+				/*background-color: #efefef;*/
+			}
+			
+			.er-row:after {
+				display: block;
+				width: 0;
+				content: '';
+				clear: both;
+				font-size: 0;
+			}
+			
+			.er-col-100 {
+				padding: 5px;
+				width: 100%;
+			}
+			
+			.er-col-50 {
+				float: left;
+				display: inline-block;
+				width: 100px;
+				/*padding: 5px;*/
+				box-sizing: border-box;
+			}
+			
+			.er-container {
+				padding: 10px 0px;
+			}
+			
+			.er-node-item {
+				margin: 5px auto;
+				display: block;
+				width: 90px;
+				line-height: 20px;
+				height: 80px;
+				overflow: hidden;
+				/*white-space: nowrap;
+				text-align: center;
+				
+				text-overflow: ellipsis;*/
+			}
+			
+			.er-node-title {
+				width: 100%;
+				padding: 5px;
+				box-sizing: border-box;
+				background-color: #124164;
+				font-size: 12px;
+				color: #FFFFFF;
+				text-align: center;
+				line-height: 20px;
+				max-height: 80px;
+				display: -webkit-box;
+				-webkit-box-orient: vertical;
+				-webkit-line-clamp: 3;
+				overflow: hidden;
+			}
+			
+			.flex-center {
+				display: -webkit-flex;
+				display: flex;
+				-webkit-align-items: center;
+				align-items: center;
+				-webkit-justify-content: center;
+				justify-content: center;
+			}
+			
+			.er-container>.er-node-item {}
+			
+			.er-edge-item {}
+			
+			.er-edge-item.yes {}
+			
+			.er-edge-item.no {}
+			
+			.er-col-50 {
+				min-height: 80px;
+			}
+			
+			.add {
+				position: fixed;
+				display: block;
+				top: 0;
+				left: 0;
+				padding: 10px;
+				background: #124164;
+				color: #FFFFFF;
+			}
+			.er-tree-container{
+				width: 200px;
+				height: auto;
+				min-height: 200px;
+				/*margin: 0 auto;*/
+			}
+			.er-canvas{
+				width: 200px;
+				height: 200px;
+			}
+			.er-container {
+				
+				position: relative;
+				margin: 20px auto;
+				width: 200px;
+				height: 200px;
+				/*width: 200px;*/
+			}
+			.er-canvas{
+				display: block;
+				position: absolute;
+				background: #efefef;
+				z-index: -1;
+				display:block;
+				border:1px solid #aaa;
+				/*left: 50%;
+    		margin-left: -100px;*/
+			}
+		</style>
+	</head>
+
+	<body>
+		<a class="add">添加</a>
+
+		<div class="er-row" style="display:none ;">
+			<div class="er-node-item">
+				<div class="er-node-title">根节点</div>
+			</div>
+			<div class="er-row">
+				<div class="er-col-50">
+					<div class="er-node-item">
+						<div class="er-node-title">规则一</div>
+					</div>
+					<div class="er-row">
+						<div class="er-col-50">
+							<div class="er-node-item">
+								<div class="er-node-title">规则一1</div>
+							</div>
+						</div>
+						<div class="er-col-50">
+							<div class="er-node-item">
+								<div class="er-node-title">规则一2</div>
+							</div>
+							<div class="er-row">
+								<div class="er-col-50">
+									<div class="er-node-item">
+										<div class="er-node-title">规则一21</div>
+									</div>
+								</div>
+								<div class="er-col-50">
+									<div class="er-node-item">
+										<div class="er-node-title">规则一22</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="er-col-50">
+					<div class="er-node-item">
+						<div class="er-node-title">规则二</div>
+					</div>
+				</div>
+			</div>
+
+		</div>
+		<br />
+		<div class="er-container">
+			<canvas id="erCanvas" class="er-canvas"></canvas><div class="er-tree-container"></div>
+			
+			<!--<div class="er-row"></div>-->
+
+		</div>
+		<script type="text/javascript" src="js/jquery-2.2.1.min.js"></script>
+		<script type="text/javascript">
+			var box = $('.er-container');
+			var canvas = document.getElementById("erCanvas");
+			var ctx = canvas.getContext("2d");
+			var ER = {
+				level: 0,
+				colNum: 0,
+				id: 0
+			}
+			function drawLine(fromX, fromY, toX, toY,color) {
+				ctx.beginPath()
+				var theta = 30, 
+				headlen = 10,
+				width = 2;
+				color = color || "#08e";
+				toY = toY-15;//带箭头要向上去一点
+				// 计算各角度和对应的P2,P3坐标 
+				var angle = Math.atan2(fromY - toY, fromX - toX) * 180 / Math.PI, 
+				angle1 = (angle + theta) * Math.PI / 180, 
+				angle2 = (angle - theta) * Math.PI / 180, 
+				topX = headlen * Math.cos(angle1), 
+				topY = headlen * Math.sin(angle1), 
+				botX = headlen * Math.cos(angle2), 
+				botY = headlen * Math.sin(angle2);
+				var arrowX = fromX - topX, 
+				arrowY = fromY - topY;
+				ctx.moveTo(arrowX, arrowY); 
+				ctx.moveTo(fromX, fromY); 
+				ctx.lineTo(toX, toY); 
+				arrowX = toX + topX; 
+				arrowY = toY + topY; 
+				ctx.moveTo(arrowX, arrowY); 
+				ctx.lineTo(toX, toY); 
+				arrowX = toX + botX; 
+				arrowY = toY + botY; 
+				ctx.lineTo(arrowX, arrowY); 
+				ctx.strokeStyle = color; 
+				ctx.lineWidth = width; 
+				ctx.stroke(); 
+				ctx.restore();
+					/*ctx.beginPath()
+					ctx.moveTo(sl, st);
+					ctx.lineTo(el, et);
+					ctx.lineWidth = 1;
+					ctx.strokeStyle = linecolor || "#08e";
+					//ctx.strokeStyle = linecolor || "#08e";
+					ctx.stroke();*/
+				}
+			function drawCanvas(width, height) {
+				width = $('.er-tree-container').outerWidth();
+				height = $('.er-tree-container').outerHeight()
+					canvas.width = width;
+					canvas.height = height;
+					$(canvas).css({
+						width:width+'px',
+						height:height+'px'
+					})
+					$('.er-container').css({
+						width:width+'px',
+						height:height+'px'
+					})
+					//在重画canvas时进行清空
+					ctx.clearRect(0,0,canvas.width,canvas.height); 
+				}
+			function getNodeDot(node){
+				//node = $(node);
+				var type = $(node).parent('.er-col-50').attr('data-type');
+				//console.log(node.offsetLeft,node.offsetTop)
+				return {
+					l: node.offsetLeft + 45,
+					t: node.offsetTop,
+					color: type == 'no' ? '#f60' : '#08e'
+				}
+			}
+
+			function redrawEdges() {
+				drawCanvas()
+				var box = $('.er-tree-container')
+				var nodes = $('.er-node-item', box)
+				var dots = [];
+				$.each(nodes,function(i,node){
+					var startid = $(node).attr('data-id')
+					var childnodes = box.find('.er-node-item[data-pid='+startid+']')
+					if(childnodes.length == 0) return;
+					var startDot = getNodeDot(node)
+					//console.log(startDot)
+					//console.log(startid+':'+childnodes.length,childnodes)
+					$.each(childnodes, function(j,childnode){
+						var endDot = getNodeDot(childnode)
+						dots.push({
+							sl: startDot.l,
+							st: startDot.t,
+							el: endDot.l,
+							et: endDot.t,
+							color: endDot.color
+						})
+					})
+				})
+				//console.log('redrawEdges',dots)
+				drawCanvas();
+				$.each(dots, function(di,dot){
+					//console.log('redrawEdges',JSON.stringify(dot))
+					drawLine(dot.sl, dot.st, dot.el, dot.et,dot.color)
+				})
+				
+			}
+			$(function() {
+
+				function insertSingleNode(target) {
+					var row = '<div class="er-row">' +
+						'<div class="er-col-50">' +
+						'</div>' +
+						'<div class="er-col-50">' +
+						'</div>' +
+						'</div>'
+					var node = '<div class="er-node-item">' +
+						'<div class="er-node-title">规则2 </div>' +
+						'</div>';
+					target.parent().append(html)
+				}
+
+				function setNodeHtml(title, pid) {
+					ER.id++;
+					pid = pid || '';
+					var aa = parseInt((Math.random() * 100)) % 2
+					title = (aa == 1) ? '子节点' : title;
+					var node = $('<div data-id="' + ER.id + '" class="er-node-item" data-pid="' + pid + '">' +
+						'<div class="er-node-title">' + ER.id + ' ' + title + '</div>' +
+						'</div>');
+					return node;
+				}
+
+				function insertNode(target) {
+					if(target.hasClass('er-tree-container')) {
+						var node = setNodeHtml('根节点')
+						target.append(node);
+						ER.target = node;
+						ER.curpid = node.attr('data-id')
+						ER.level++
+							return;
+					}
+					if(target.hasClass('er-node-item')) {
+						var sb = target.parent().siblings('.er-col-50')
+						var appendTarget = null;
+						var level = ER.level;
+						//var pid = target.attr('data-id')
+
+						if(sb.is(':empty')) {
+							appendTarget = sb;
+							var pid = appendTarget.parent('.er-row').attr('data-pid');
+							var node = setNodeHtml('子节点一子节点一子节点一子节点一', pid)
+							appendTarget.append(node);
+							redrawEdges()
+							ER.target = node;
+						} else {
+							var pid = target.attr('data-id');
+							var node = setNodeHtml('子节点一子节点一子节点一子节点一', pid)
+							var row = $('<div data-level="' + ER.level + '" data-pid="' + pid + '" class="er-row">' +
+								'<div data-type="yes" class="er-col-50">' +
+								'</div>' +
+								'<div data-type="no" class="er-col-50">' +
+								'</div>' +
+								'</div>')
+							target.parent().append(row);
+
+							var minW = 200; //200  er-row最小宽度
+							var w = row.outerWidth();
+							var gap = (minW - w);
+							var gapi = 0
+
+							function todo(row, neww) {
+								//console.log(row, row.outerWidth())
+								var pdom = row.parent(); //.er-tree-container容器或者是'.er-col-50'
+								pdom.width(row.outerWidth());
+								var prow = pdom.parent('.er-row')
+								if(prow.length) {
+									var cw = 0;
+									var ldom = prow.children('.er-col-50').eq(0);
+									var rdom = prow.children('.er-col-50').eq(1);
+									var cl = ldom.outerWidth(),cr = rdom.outerWidth()
+									cw = Math.ceil(cl+cr);
+									prow.width(cw);
+									if(cl > cr){
+										var ml = (cl/2) + (cw/4) -50
+										prow.siblings('.er-node-item').css({marginLeft:ml+'px'})
+									}else if(cl < cr){
+										var ml = (cl/2) + (cw/4) -50
+										prow.siblings('.er-node-item').css({marginLeft:ml+'px'})
+									}
+									todo(prow)
+								}
+							}
+							if(w < minW) {
+								row.width(minW);
+								todo(row, minW);
+							}
+
+							var aa = parseInt((Math.random() * 100)) % 2
+							appendTarget = row.children('.er-col-50').eq(aa);
+							ER.level++
+								ER.colNum = Math.pow(2, ER.level - 1);
+
+							appendTarget.append(node);
+							redrawEdges()
+							ER.target = node;
+						}
+
+						//adjustWidth()
+						return;
+					}
+					return;
+					var html = '<div class="er-row">' +
+						'<div class="er-col-50">' +
+						'<div class="er-node-item">' +
+						'<div class="er-node-title">规则2 </div>' +
+						'</div>' +
+
+						'</div>' +
+						'<div class="er-col-50">' +
+						'<div class="er-node-item">' +
+						'<div class="er-node-title">规则12规则22规则32规则42规则52规则62规则72</div>' +
+						'</div>' +
+						'</div>' +
+						'</div>';
+					target.parent().append(html)
+
+				}
+
+				ER.target = $('.er-tree-container')
+				$('.add').on('click', function() {
+					insertNode(ER.target)
+				})
+			})
+		</script>
+	</body>
+
+</html>

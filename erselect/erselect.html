@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<link rel="stylesheet" type="text/css" href="./css/erselect.css" />
+	</head>
+
+	<body>
+		<form id="layForm" style="display: block;" class="er-form er-border"><input type="hidden" name="ruleId" value="a"><input type="hidden" name="ruleName" value="拖规则一"><input type="hidden" name="enable" value="1">
+			<input type="hidden" name="nodepid" value="12">
+			<div class="er-form-group"><label class="er-label">规则名称：</label>
+				<div class="er-input-content"><span class="er-form-text">拖规则一</span></div>
+			</div>
+			<div class="er-row">
+				<div class="er-col-half er-form-group"><label class="er-label">规则编码：</label>
+					<div class="er-input-content">a</div>
+				</div>
+				<div class="er-col-half er-form-group"><label class="er-label">规则状态：</label>
+					<div class="er-input-content"><span class="er-form-text">启用</span></div>
+				</div>
+			</div>
+			<div class="er-form-group"><label class="er-label">测试：</label>
+				<div class="er-input-content">
+					<div class="er-input-row">
+						<div class="er-select" id="s1" name="test"></div>
+					</div>
+				</div>
+			</div>
+			<div class="er-form-group"><label class="er-label">规则逻辑：</label>
+				<div class="er-input-content">
+					<div class="er-input-row">
+						<div class="er-select" id="a_0" name="a_0"></div>
+						<div class="er-select" id="b_0" name="b_0" style="width:50px;"></div>
+						<div class="er-select" id="c_0" name="c_0"></div>
+					</div>
+				</div>
+			</div>
+			<div class="er-form-group"><label class="er-label">规则逻辑：</label>
+				<div class="er-input-content">
+					<div class="er-input-row">
+						<div class="er-select" multiple="multiple">
+							<div class="er-select-head"><input type="text" readonly="" class="er-form-control" value="" placeholder="请选择"><input type="hidden" name="a_0" value=""><span class="er-select-icon">▼</span></div>
+							<ul class="er-menu" style="">
+								<li class="er-menu-item" data-item="1">选项一</li>
+								<li class="er-menu-item" data-item="2">选项二</li>
+								<li class="er-menu-item" data-item="3">选项三</li>
+								<li class="er-menu-item" data-item="4">选项四</li>
+							</ul>
+						</div>
+						<div class="er-select" style="width:50px">
+							<div class="er-select-head"><input type="text" readonly="" class="er-form-control" value="" placeholder="="><input type="hidden" name="b_0" value="="><span class="er-select-icon">▼</span></div>
+							<ul class="er-menu" style="">
+								<li class="er-menu-item" data-item="=">=</li>
+								<li class="er-menu-item" data-item="<">&lt;</li>
+							</ul>
+						</div>
+						<div class="er-select" multiple="multiple">
+							<div class="er-select-head"><input type="text" readonly="" class="er-form-control" value="" placeholder="请选择"><input type="hidden" name="c_0" value=""><span class="er-select-icon">▼</span></div>
+							<ul class="er-menu" style="">
+								<li class="er-menu-item" data-item="1">选项一</li>
+								<li class="er-menu-item" data-item="2">选项二</li>
+								<li class="er-menu-item" data-item="3">选项三</li>
+								<li class="er-menu-item" data-item="4">选项四</li>
+							</ul>
+						</div>
+					</div>
+					<div class="er-input-row">
+						<div class="er-select" multiple="multiple">
+							<div class="er-select-head"><input type="text" readonly="" class="er-form-control" value="" placeholder="请选择"><input type="hidden" name="a_1" value=""><span class="er-select-icon">▼</span></div>
+							<ul class="er-menu" style="">
+								<li class="er-menu-item" data-item="1">选项一</li>
+								<li class="er-menu-item" data-item="2">选项二</li>
+								<li class="er-menu-item" data-item="3">选项三</li>
+								<li class="er-menu-item" data-item="4">选项四</li>
+							</ul>
+						</div>
+						<div class="er-select" style="width:50px">
+							<div class="er-select-head"><input type="text" readonly="" class="er-form-control" value="" placeholder="="><input type="hidden" name="b_1" value="="><span class="er-select-icon">▼</span></div>
+							<ul class="er-menu" style="">
+								<li class="er-menu-item" data-item="=">=</li>
+								<li class="er-menu-item" data-item="<">&lt;</li>
+							</ul>
+						</div>
+						<div class="er-select" multiple="multiple">
+							<div class="er-select-head"><input type="text" readonly="" class="er-form-control" value="" placeholder="请选择"><input type="hidden" name="c_1" value=""><span class="er-select-icon">▼</span></div>
+							<ul class="er-menu" style="">
+								<li class="er-menu-item" data-item="1">选项一</li>
+								<li class="er-menu-item" data-item="2">选项二</li>
+								<li class="er-menu-item" data-item="3">选项三</li>
+								<li class="er-menu-item" data-item="4">选项四</li>
+							</ul>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="er-form-group"><span class="error-tip" id="errorTip"></span></div>
+			<div class="er-btnrow">
+				<a id="cancel" class="button button-default">设值并禁用</a>
+				<a id="confirm" class="button">确认</a>
+			</div>
+		</form>
+
+		<script type="text/javascript" src="js/jquery-2.2.1.min.js"></script>
+		<script type="text/javascript" src="js/erselect.js"></script>
+		<script>
+			$(function() {
+				//调用erselect方法
+				$('#s1').erselect({
+					multiple: true,//是否多选
+					readonly: true,//是否只读
+					disabled: false,//是否禁用
+					valueField: "value",//值字段名称
+					textField: "text",//描述字段名称
+					data: [{
+						value: "1",
+						text: "选项一"
+					}, {
+						value: "2",
+						text: "选项二"
+					}]//数据
+				})
+				$('#a_0').erselect({
+					multiple: false,
+					readonly: false,
+					disabled: false,
+					valueField: "value",
+					textField: "text",
+					data: [{
+						value: "a1",
+						text: "a1"
+					}, {
+						value: "a2",
+						text: "a2"
+					}]
+				})
+				$('#b_0').erselect({
+					multiple: false,
+					readonly: false,
+					disabled: false,
+					valueField: "value",
+					textField: "text",
+					placeholder: "符号",
+					data: [{
+						value: "=",
+						text: "="
+					}, {
+						value: ">",
+						text: ">"
+					}]
+				})
+				$('#c_0').erselect({
+					multiple: true,
+					readonly: false,
+					disabled: false,
+					valueField: "value",
+					textField: "text",
+					data: [{
+						value: "c1",
+						text: "c1"
+					}, {
+						value: "c2",
+						text: "c2"
+					}]
+				})
+				$('#c_0').erselect({
+					data: [{
+						value: "d1",
+						text: "d1"
+					}, {
+						value: "d2",
+						text: "d2"
+					}]
+				})
+				//取值
+				$('#confirm').on('click', function() {
+					var val = $('#c_0').erselect('getValue');
+					console.log(val)
+				})
+				//设值，禁用
+				$('#cancel').on('click', function() {
+					$('#c_0').erselect('setValue','d2')
+					$('#c_0').erselect({disabled:true})
+				})
+
+			})
+		</script>
+	</body>
+
+</html>

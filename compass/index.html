@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<style>
+			html,
+			body,
+			div,
+			a,
+			p,
+			ul,
+			li {
+				margin: 0;
+				padding: 0;
+				font-size: 12px;
+				color: #333;
+			}
+			
+			ul,
+			li {
+				list-style: none;
+			}
+			
+			a {
+				text-decoration: none;
+				cursor: pointer;
+			}
+			
+			.compass_container{
+				width: 300px;
+				margin: 10px auto;
+				color: #189BE6;
+			}
+			.compass_result{
+				display: none;
+				width: 200px;
+				height: 200px;
+				/*margin: 50px auto;*/
+				position: relative;
+				border: 1px solid #ddd;
+			}
+			.compass_result>div{
+				margin-top: 10px;
+				padding: 10px;
+				line-height: 30px;
+				font-size: 18px;
+			}
+			.compass_box {
+				width: 200px;
+				height: 200px;
+				/*margin: 50px auto;*/
+				position: relative;
+				background: url(./compass.png) no-repeat center 0px;
+				background-size: 100%;
+				border: 1px solid #ddd;
+			}
+			
+			.compass_box .compass_colorborder {
+				position: absolute;
+				z-index: 1;
+				top: 0;
+				bottom: 0;
+				left: 0;
+				right: 0;
+				background: url(./border.png) no-repeat center 0px;
+				background-size: 200px;
+				background-size: 100%;
+			}
+			
+			.compass_box .compass_wrapper {
+				width: 100px;
+				height: 200px;
+				position: absolute;
+				top: 0;
+				overflow: hidden;
+				z-index: 2;
+				height: 100%;
+			}
+			
+			.compass_box .compass_right {
+				right: 0;
+				-webkit-transform: rotate(0deg);
+			}
+			
+			.compass_box .compass_left {
+				left: 0;
+			}
+			
+			.compass_box .compass_circle {
+				position: absolute;
+				top: 0;
+				z-index: 2;
+				width: calc(200% - 14px);
+				height: calc(100% - 14px);
+				border: 6px solid transparent;
+				border-radius: 50%;
+				transition: transform linear .2s;
+			}
+			
+			.compass_box .compass_rightcircle {
+				right: 0px;
+				border-top: 6px solid rgba(238, 238, 238, .8);
+				border-right: 6px solid transparent;
+				border-left: 6px solid rgba(238, 238, 238, .8);
+				border-bottom: 6px solid transparent;
+				-webkit-transform: rotate(-226deg);
+				/*加大时显示底层，最大-113deg，幅度112*/
+			}
+			.compass_right:after{
+				position: absolute;
+				z-index: 4;
+				right: 0;
+				bottom: 0;
+				display: block;
+				content: '';
+				width: 100%;
+				height: 33%;
+				background-color: #FFFFFF;
+				
+			}
+			
+			.compass_box .compass_leftcircle {
+				left: 0;
+				border-top: 6px solid rgba(238, 238, 238, .8);
+				border-right: 6px solid transparent;
+				border-left: 6px solid rgba(238, 238, 238, .8);
+				border-bottom: 6px solid transparent;
+				-webkit-transform: rotate(24deg);
+				/*加大时显示底层，最大136deg,幅度112*/
+			}
+			
+			.compass_box .compass_pin {
+				position: absolute;
+				z-index: 3;
+				top: 0;
+				bottom: 0;
+				left: 0;
+				right: 0;
+				background: url(./pin.png) no-repeat center;
+				background-size: 100%;
+				transition: transform linear .2s;
+			}
+			.compass_box .compass_text{
+				position: absolute;
+				z-index: 9;
+				top: 50%;
+				bottom: 0;
+				left: 0;
+				right: 0;
+				margin-top: -40px;
+				text-align: center;
+			}
+			.compass_box .compass_text .compass_score{
+				font-size: 60px;
+				height: 60px;
+				line-height: 60px;
+				/*color: #189BE6;*/
+				
+			}
+			.compass_box .compass_text .compass_title{
+				margin-top: 20px;
+				font-size: 20px;
+				line-height: 30px;
+				color: #189BE6;
+				
+			}
+			.compass_container.blue .compass_score,.compass_container.blue .compass_result>div{
+				color: #189BE6;
+			}
+			.compass_container.orange .compass_score,.compass_container.orange .compass_result>div{
+				color: #f60;
+			}
+			.compass_container.red .compass_score,.compass_container.red .compass_result>div{
+				color: #E30E14;
+			}
+			.switch-btn{
+				text-align: right;
+				height: 20px;
+				margin: 5px;
+				cursor: pointer;
+			}
+			.fa{
+				display: inline-block;
+				width: 20px;
+				height: 20px;
+			}
+			.fa-refresh:after{
+				display: inline-block;
+				content: '';
+				width: 20px;
+				height: 20px;
+				background: url(./pass.png) no-repeat center;
+				background-size: 100%;
+			}
+			
+			.compass_container.reserve .compass_box{
+				display: none;
+			}
+			.compass_container.reserve .compass_result{
+				display: block;
+			}
+		</style>
+	</head>
+
+	<body>
+		<p style="width: 300px;margin: 20px auto;">
+			<input id="score" type="text" placeholder="信用分" />
+			<a id="showPinBtn" href="javascript:;">显示分数</a>
+		</p>
+		<div class="compass_container">
+			<div class="switch-btn"><span class="fa fa-refresh"></span></div>
+			<div class="compass_result">
+				<div>信用积分：<span class="compass_result_score"></span></div>
+				<div>可款额度：<span class="compass_result_amount"></span></div>
+			</div>
+			<div class="compass_box">
+			<div class="compass_colorborder"></div>
+			<div class="compass_pin"></div>
+			<div class="compass_wrapper compass_right">
+				<div class="compass_circle compass_rightcircle"></div>
+			</div>
+			<div class="compass_wrapper compass_left">
+				<div class="compass_circle compass_leftcircle"></div>
+			</div>
+			<div class="compass_text">
+				<div class="compass_score"></div>
+				<div class="compass_title">信用积分</div>
+			</div>
+		</div>
+		</div>
+		<script type="text/javascript" src="jquery-2.2.1.min.js"></script>
+		<script type="text/javascript">
+			var fun = {
+				todoCompassPin: function(box, score,amount) {
+					var pinDom = box.find('.compass_pin'),
+						leftCircle = box.find('.compass_leftcircle'),
+						rightCircle = box.find('.compass_rightcircle'),
+						scoreDom = box.find('.compass_score');
+					var totalScore = 1000, //总分
+						scope = 226, //总旋转幅度
+						half = (scope / 2), //旋转半幅度
+						ls = 24, //左边初始旋转角度
+						rs = -226, //右边初始旋转角度
+						maxl = ls + half, //左边最大旋转角度
+						maxr = rs + half; //右边最大旋转角度最大应该-113
+					var totalDeg = (score / totalScore) * scope;
+					var pinsDeg = totalDeg - half;
+					pinsDeg = pinsDeg < -half ? -half : pinsDeg > half ? half : pinsDeg;
+					var lDeg = pinsDeg >= 0 ? maxl : (ls + half + pinsDeg);
+					lDeg = lDeg < ls ? ls : lDeg > maxl ? maxl : lDeg;
+					var rDeg = pinsDeg <= 0 ? rs : (rs + pinsDeg);
+					rDeg = rDeg < rs ? rs : rDeg > maxr ? maxr : rDeg;
+					pinDom.css('transform', 'rotate(' + pinsDeg + 'deg)');
+					console.log(rDeg)
+					var scoreCls = score >= 700 ? 'blue' : score >= 300 ? 'orange' : 'red'; 
+					scoreDom.text(score).parents('.compass_container').removeClass('blue orange red').addClass(scoreCls);
+					var resbox = box.siblings('.compass_result')
+					resbox.find('.compass_result_score').text(score+'分')
+					amount = score >= 700 ? amount : score >= 300 ? (amount/2) : 0;
+					resbox.find('.compass_result_amount').text((amount||0)+'.00K')
+					//只有初次加载时才能这样用，如果中途页面会变化时得要判断之前的，再决定延时是左边还是右边
+					leftCircle.css('transform', 'rotate(' + lDeg + 'deg)');
+					setTimeout(function() {
+						rightCircle.css('transform', 'rotate(' + rDeg + 'deg)');
+					}, 200);
+				}
+			}
+			$(function() {
+				$('.switch-btn').on('click', function() {
+					$(this).parent('.compass_container').toggleClass('reserve')
+				})
+				$('#showPinBtn').on('click', function() {
+					var score = parseFloat($('#score').val());
+					if(!score && score != 0) return false;
+					var box = $('.compass_box');
+					var amount = parseInt(score / 100)*10;
+					fun.todoCompassPin(box, score, amount);
+				})
+			})
+		</script>
+	</body>
+
+</html>

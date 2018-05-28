@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<title>主页</title>
+		<style>
+			html,
+			body,
+			div,
+			span,
+			a,
+			ul,
+			li {
+				margin: 0;
+				padding: 0;
+			}
+			
+			a {
+				text-decoration: none;
+			}
+			
+			ui,
+			li {
+				list-style: none;
+			}
+			
+			#container {
+				height: 80px;
+				line-height: 20px;
+				overflow: hidden;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div id="container">
+			<ul></ul>
+		</div>
+		<script src="js/jquery-2.2.1.min.js"></script>
+		<script>
+			$(function() {
+
+				var tempData = [],
+					containerBox = $("#container");
+
+				//请求数据方法，count用来测试数据的
+				var count = 0;
+
+				function apendNoticeData() {
+					$.get('./jsondata/noticelist.json?t_' + new Date().getTime(), function(res) {
+						//防止没有数据时没有东西滚了;
+						if(res.respCode == '0000' && res.rows && res.rows.length) {
+							tempData = res.rows;
+						}
+						for(var i = 0, l = tempData.length; i < l; i++) {
+							count++;
+							var row = tempData[i];
+							//这里改添加的数据和样式
+							$('<li><a href="javascript:;" title="列表项' + count + '">' + (row.name + count) + ('，值：' + row.value) + '</a></li>').appendTo($("#container ul"));
+						}
+						if(tempData.length == 0)
+							$('<li class="empty-row">暂无数据</li>').appendTo($("ul", containerBox));
+					})
+				}
+
+				//初始先请求一次添加数据
+				apendNoticeData();
+
+				//定时器
+				var scrollNoticeTimer;
+				//容器悬浮时清除定时器，移开时启动定时器
+				containerBox.hover(function() {
+					clearInterval(scrollNoticeTimer);
+				}, function() {
+					scrollNoticeTimer = setInterval(function() {
+						todoScrollNoticeEvent();
+					}, 2000);
+				}).trigger("mouseleave");
+
+				//滚动事件
+				function todoScrollNoticeEvent($ul) {
+					var $ul = $("ul", containerBox);
+					var $lis = $ul.find("li");
+					if($lis.length <= 4) {
+						//可见li快结束时请求新数据，数字应为容器高度除以li高度的floor值,未防没有数据，写死
+						apendNoticeData()
+					}
+					//li的高度
+					var liLineHeight = $ul.find("li:first").height();
+					//动态向上滚动一行li，滚完后移除已滚li
+					$ul.animate({
+						"marginTop": -liLineHeight + "px"
+					}, 1000, function() {
+						$ul.css({
+							marginTop: 0
+						}).find("li:first").remove();
+					});
+				}
+			});
+		</script>
+	</body>
+
+</html>

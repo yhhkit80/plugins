@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="cn">
+
+	<head>
+		<meta charset="UTF-8">
+		<title>ercircle</title>
+		<link rel="stylesheet" type="text/css" href="css/ercircle.css" />
+	</head>
+
+	<body>
+		<div class="er-flexcenterbox">
+			<div id="circle" class="er-circle-container"></div>
+			<div id="circle1"></div>
+			<div id="circle2"></div>
+			<div id="circle3"></div>
+		</div>
+		<div id="circle4"></div>
+
+		<!--<a href="javascript:;" id="setval">重新设值</a>-->
+
+		<!-- 页面渲染后代码参考
+		<div class="er-circle-container" style="width: 100px;height: 100px;">
+			<svg viewBox="0 0 100 100">
+				<path d="M 50,50 m 0,-47.5 a 47.5,47.5 0 1 1 0,95 a 47.5,47.5 0 1 1 0,-95" stroke="#eaeef2" stroke-width="5" fill-opacity="0"></path>
+				<path d="M 50,50 m 0,-47.5 a 47.5,47.5 0 1 1 0,95 a 47.5,47.5 0 1 1 0,-95" stroke-linecap="round" stroke-width="5" fill-opacity="0" style="stroke-dasharray: 298.45130209103036px 298.45130209103036px;stroke-dashoffset: 298.45130209103036px;transition: stroke-dashoffset 0.6s ease 0s, stroke 0.6s ease" stroke="#f00"></path>
+			</svg>
+			<div class="er-circle-inner"><span style="font-size: 24px;">0%</span></div>
+		</div>-->
+
+		<script src="js/jquery-2.2.1.min.js" type="text/javascript" charset="utf-8"></script>
+		<script src="js/ercircle.js" type="text/javascript" charset="utf-8"></script>
+		<script>
+			var val = 0;
+			$(function() {
+				//调用ercircle
+				$('#circle').ercircle({
+					value: 0, //值，必填
+					total: 0, //总值
+					strokeColor: '#f00', //百分比所在路径边框颜色
+					formatter: function(options, percent) { //格式化中间的显示文字，percent为实时计算后的百分比，这里的内容样式自行调整
+						return '<span style="line-height:20px;font-size:20px;">' + options.value + '件</span><br><br></span>' + percent.toFixed(2) + '%</span>'
+					},
+				});
+				$('#circle1').ercircle({
+					value: 123, //值，必填
+					total: 1000, //总值
+					size: 200, //圆直径
+					strokeColor: '#f60', //百分比所在路径边框颜色
+					trailColor: '#fddac3', //圆环边框底色
+					formatter: function(options, percent) { //格式化中间的显示文字，percent为实时计算后的百分比
+						return '<span style="line-height:20px;font-size:20px;">' + options.value + '件</span><br><br></span>' + percent.toFixed(2) + '%</span>'
+					},
+				});
+				$('#circle2').ercircle({
+					value: 200, //值，必填
+					total: 1000, //总值
+					size: 200,
+					strokeColor: '#ff0', //百分比所在路径边框颜色
+					trailColor: '#f9f9b0', //圆环边框底色
+					formatter: function(options, percent) { //格式化中间的显示文字，percent为实时计算后的百分比
+						return '<span style="line-height:20px;font-size:20px;">' + options.value + '件</span><br><br></span>' + percent.toFixed(2) + '%</span>'
+					},
+				});
+				$('#circle3').ercircle({
+					value: 650, //值，必填
+					total: 1000, //总值
+					size: 200,
+					strokeColor: '#0f0',
+					formatter: function(options, percent) { //格式化中间的显示文字，percent为实时计算后的百分比
+						return '<span style="line-height:20px;font-size:20px;">' + options.value + '件</span><br><br></span>' + percent.toFixed(2) + '%</span>'
+					},
+				});
+				$('#circle4').ercircle({
+					value: 650, //值，必填
+					total: 1000, //总值
+					size: 200,
+					strokeColor: '#0f0',
+					formatter: function(options, percent) { //格式化中间的显示文字，percent为实时计算后的百分比
+						return '<span style="line-height:20px;font-size:20px;">' + options.value + '件</span><br><br></span>' + percent.toFixed(2) + '%</span>'
+					},
+				});
+			})
+			//根据数据变化动态渲染
+//			setInterval(function() {
+//				val += 5;
+//				if(val > 1000) val = 0;
+//				$('#circle').ercircle({
+//					value: val, //改值
+//					strokeColor: 'blue' //换色
+//				})
+//			}, 10)
+			//			$('#setval').on('click', function() {
+			//				val += 50;
+			//				if(val > 1000) val = 0;
+			//				$('#circle').ercircle({
+			//					value: val,
+			//					strokeColor: 'blue'
+			//				})
+			//			});
+		</script>
+	</body>
+
+</html>

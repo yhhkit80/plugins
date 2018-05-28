@@ -1,0 +1,273 @@
+html,
+body,
+div,
+span,
+a {
+	margin: 0;
+	padding: 0;
+}
+.er-menu {
+	list-style: none;
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: 99;
+	padding: 5px 0;
+	min-width: 80px;
+	max-height: 136px;
+	overflow-y: auto;
+	margin: 0;
+	display: none;
+	font-family: "微软雅黑";
+	font-size: 14px;
+	background-color: #fff;
+	border: 1px solid rgba(0, 0, 0, .15);
+	box-sizing: border-box;
+	border-radius: 4px;
+	-webkit-box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+	-moz-box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+	-ms-box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+	-o-box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.er-menu-item {
+	margin-top: 1px;
+	padding-left: 5px;
+	padding-right: 5px;
+	height: 30px;
+	line-height: 30px;
+	text-align: left;
+	cursor: default;
+}
+
+.er-menu-item:hover {
+	background-color: #4e5c69;
+	color: #FFFFFF;
+}
+
+.er-menu-item.er-selected {
+	background-color: #343a40;
+	color: #FFFFFF;
+}
+
+.er-btnrow {
+	margin-top: 20px;
+	margin-bottom: 50px;
+	text-align: center;
+}
+
+.vertical-top {
+	vertical-align: top;
+}
+
+.vertical-middle {
+	vertical-align: middle;
+}
+.er-form-group .er-label {
+	display: inline-block;
+	width: 100px;
+	padding-right: 10px;
+	max-width: 100%;
+	font-weight: 700;
+	text-align: right;
+	line-height: 34px;
+}
+
+.er-form-group .er-form-control {
+	display: inline-block;
+	width: 160px;
+	padding: 5px 5px;
+	font-size: 12px;
+	line-height: 16px;
+	color: #555;
+	background-color: #fff;
+	background-image: none;
+	border: 1px solid #ccc;
+	-webkit-border-radius: 4px;
+	border-radius: 4px;
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
+	-webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
+	box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
+	-webkit-transition: border-color ease-in-out .15s, -webkit-box-shadow ease-in-out .15s;
+	-o-transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+	transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+}
+
+.er-form-group select.er-form-control {
+	/*select的padding会无效，手动加一下*/
+	width: 186px;
+}
+
+.er-form-group .radio-inline {
+	display: inline-block;
+	margin-right: 15px;
+	width: 100px;
+}
+
+.er-form-group .radio-inline,
+.er-form-group .radio-inline input {
+	vertical-align: middle;
+}
+
+.er-form-group .radio-inline input {
+	margin-top: -3px;
+}
+
+.text-center {
+	text-align: center;
+}
+
+.button {
+	cursor: pointer;
+	margin-left: 5px;
+	padding: 5px 15px;
+	border-radius: 2px;
+	color: #FFFFFF;
+	font-size: 14px;
+	background-color: #01ace2;
+	border: 1px solid #01ace2;
+}
+
+.button:active,
+.button:focus {
+	border: 1px solid transparent;
+	outline: none;
+}
+
+.button:hover {
+	background-color: #11bcf2;
+}
+
+.button.disabled,
+.button:disabled {
+	cursor: not-allowed;
+	background: #eee;
+}
+
+.button-default {
+	background-color: transparent;
+	color: #999999;
+	border: 1px solid #dddddd;
+}
+
+.button-default:hover {
+	background-color: #eeeeee;
+}
+
+.error-tip {
+	margin-left: 100px;
+	color: #FF3300;
+}
+
+.er-form-group>.er-label {
+	display: block;
+	float: left;
+	vertical-align: top;
+}
+
+.er-form-group>.er-label+* {
+	display: block;
+	float: left;
+	width: calc(100% - 110px);
+	padding: 5px 0;
+	line-height: 24px;
+}
+
+.er-select+.er-form-control,
+.er-select+.er-select,
+.er-form-control+.er-form-control {
+	margin-left: 5px;
+	vertical-align: top;
+}
+
+.er-form-group .er-form-text {}
+
+.er-input-row {
+	margin-bottom: 6px;
+}
+
+.er-form.er-border {
+	border: 1px solid #eee;
+	box-sizing: border-box;
+}
+
+
+/*下拉框样式*/
+
+.er-select {
+	position: relative;
+	display: inline-block;
+	vertical-align: top;
+	background: rgba(0, 0, 0, 0);
+	width: 186px;
+	height: 28px;
+	font-family: "微软雅黑";
+	font-size: 12px;
+	/*border: 1px #1a1a1a solid;
+				border-radius: 5px;*/
+}
+
+.er-select .er-menu {
+	min-width: 20px;
+}
+
+.er-select.disabled .er-form-control {
+	background-color: #EEEEEE;
+	cursor: not-allowed;
+}
+
+.er-select-head {
+	overflow: hidden;
+	width: 100%;
+	/*height: 30px;*/
+}
+
+input:read-only {
+	cursor: default;
+}
+
+.er-select-head .er-select-head-cont {
+	float: left;
+}
+
+.er-select-head .er-select-icon {
+	position: absolute;
+	right: 5px;
+	top: 0px;
+	line-height: 28px;
+	opacity: .8;
+	cursor: default;
+	transform: scale(.8);
+}
+
+.er-select-head .er-select-icon:hover {
+	opacity: 1;
+}
+
+.er-select-head+.er-menu {
+	width: 100%;
+	top: 30px;
+}
+
+.er-select-head>.er-form-control {
+	width: 100%;
+	box-sizing: border-box;
+	padding-right: 20px;
+}
+
+.er-option {
+	text-indent: 10px;
+	margin-top: 1px;
+	width: 249px;
+	color: black;
+	background: rgba(236, 111, 111, 0.1);
+	line-height: 25px;
+	border: 1px #cfcfcf solid;
+	display: none;
+}
+
+.er-option-item:hover {
+	background: rgba(204, 106, 67, 0.3);
+}

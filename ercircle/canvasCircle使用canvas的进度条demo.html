@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<style>
+			.item {  
+  float:left;  
+  width:180px;  
+  height:200px;  
+  text-align:center;  
+}  
+.item h2 {  
+  font-size:16px;  
+} 
+		</style>
+	</head>
+	<body>
+		
+		<div class="chart-list">  
+  <div class="item fl">  
+    <div class="chart">  
+      <canvas id="pullCanvas" width="180" height="180" data-total="28545" data-curr="28544"></canvas>  
+    </div>  
+    <h2 class="info">28544/28545</h2>  
+  </div>  
+  <div class="item  fl">  
+    <div class="chart">  
+      <canvas id="priceCanvas" width="180" height="180" data-total="34510" data-curr="24010"></canvas>  
+    </div>  
+    <h2 class="info">24010/34510</h2>  
+  </div>  
+  <div class="item  fl">  
+    <div class="chart">  
+      <canvas id="getCanvas" width="180" height="180" data-total="545411" data-curr="454011"></canvas>  
+    </div>  
+    <h2 class="info">454011/545411</h2>  
+  </div>  
+  <div class="item  fl">  
+    <div class="chart">  
+      <canvas id="clickCanvas" width="180" height="180" data-total="100" data-curr="66"></canvas>  
+</div>  
+    <h2 class="info">66/100</h2>  
+  </div>  
+</div> 
+
+		
+		<script src="js/jquery-2.2.1.min.js" type="text/javascript" charset="utf-8"></script>
+		<script type="text/javascript">
+			(function($, window, undefined) {  
+  
+     $.fn.canvasChart = function(options) {  
+  
+       var defaults = { };  
+       var settings = $.extend({}, defaults, options);  
+       var canvas = $(this).get(0);  
+       var total =  $(this).attr("data-total");  
+       var curr = $(this).attr("data-curr");  
+       var constrast = parseFloat(curr/total).toFixed(2); //比例  
+       var context = null;  
+  
+       if ( !canvas.getContext) {  
+         return;  
+       }  
+  
+       // 定义开始点的大小  
+       var startArc = Math.PI/2;  
+       // 根据占的比例画圆弧  
+       var endArc = (Math.PI * 2) * (constrast);  
+  
+       context = canvas.getContext("2d");  
+       context.translate(90,90);  
+  
+       // 绘制背景圆  
+       context.save(); // 保存当前状态 包含 颜色  路径  变形  
+       context.beginPath(); // 定义一个子路径开始  
+       context.strokeStyle = "#e9e9e9"; //线的颜色  
+       context.lineWidth = "4";// 线的大小  
+       context.arc(0, 0, 83, 0, Math.PI * 2, true);// 画一个圆  
+       context.closePath();// 关闭子路径  
+       context.stroke();  
+  
+       context.restore();// 还原上一个save保存的状态  
+  
+       // 绘制比例圆  
+       context.save();  
+       context.rotate(-startArc + Math.PI/180*2);  
+       context.beginPath();  
+       context.strokeStyle = settings.borderColor;  
+       context.lineWidth = "4";  
+       context.arc(0, 0, 83, 0, (curr % total == 0 ? Math.PI*2 : (endArc-Math.PI/180*3)), false);  
+       context.stroke();  
+  
+       context.restore();  
+  
+       // 判断如果是百分百就不用画开始点和结束点的圆了  
+       if ( curr % total == 0) {  
+         return;  
+       }  
+  
+       // 绘制开始时圆点  
+       context.save();  
+       context.rotate(-startArc);  
+       context.beginPath();  
+       context.fillStyle = settings.borderColor;  
+       context.arc(83, 2, 2, 0, (Math.PI * 2) , false);  
+       context.fill();  
+  
+       context.restore();  
+  
+       // 绘制结束时圆点  
+       context.save();  
+       context.rotate(endArc-startArc);  
+       context.beginPath();  
+       context.fillStyle = settings.borderColor;  
+       context.arc(83, -2, 2, 0, (Math.PI * 2) , false);  
+       context.fill();  
+  
+       context.restore();  
+  
+     }  
+  
+   })($, window);  
+  
+  
+  
+   $("#pullCanvas").canvasChart({  
+     borderColor: "#3ebfbe"  
+   });  
+   $("#priceCanvas").canvasChart({  
+     borderColor: "#cc6600"  
+   });  
+   $("#getCanvas").canvasChart({  
+     borderColor: "#f9a53e"  
+   });  
+   $("#clickCanvas").canvasChart({  
+     borderColor: "#fa4444"  
+   }); 
+		</script>
+	</body>
+</html>

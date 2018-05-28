@@ -1,0 +1,152 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<script src="http://apps.bdimg.com/libs/jquery/1.8.3/jquery.js"></script>
+		<title>主页</title>
+		<style>
+			/*模块拖拽*/
+			
+			.drag {
+				padding: 5px;
+				cursor: move;
+			}
+		</style>
+		<script>
+		</script>
+
+	</head>
+
+	<body>
+		<div id="centermain">
+			<ul>
+				<li>
+					<div id="a" class="drag" draggable="true" data-type="RULE" data-class="WarnAddress">拖规则一</div>
+				</li>
+				<li>
+					<div id="b" class="drag" draggable="true" data-type="RULE" data-class="RULE002">拖规则二</div>
+				</li>
+				<li>
+					<div id="c" class="drag" draggable="true" data-type="RULE" data-class="RULE003">拖规则三</div>
+				</li>
+				<li>
+					<div id="d" class="drag" draggable="true" data-type="TERMINAL" data-class="HIGH">拖结果一</div>
+				</li>
+				<li>
+					<div id="e" class="drag" draggable="true" data-type="TERMINAL" data-class="MIDDLE">拖结果二</div>
+				</li>
+			</ul>
+		</div>
+		<script src="js/jquery-2.2.1.min.js"></script>
+		<script>
+			var rulelist = {
+				"com.godsuy.mogo.bigdata.ruleengine.rule.RestAddressDegree": {
+					"ruleDescribe": "",
+					"ruleTitle": "居住地址真实程度",
+					"argument": [{
+						"left": "居住地址可信程度",
+						"oper": ">",
+						"right": 0.8
+					}],
+					"ruleType": "PERSONALINFO"
+				},
+				"com.godsuy.mogo.bigdata.ruleengine.rule.WarnAddress": {
+					"ruleDescribe": "",
+					"ruleTitle": "申请人地址高危",
+					"argument": [{
+						"left": "高危地址为",
+						"oper": "in",
+						"right": [
+							"红寺堡",
+							"彭阳",
+							"固原",
+							"同心",
+							"海原",
+							"西吉"
+						]
+					}],
+					"ruleType": "GROUPFRAUD"
+				},
+				"com.godsuy.mogo.bigdata.ruleengine.rule.MainMobileUnit": {
+					"ruleDescribe": "",
+					"ruleTitle": "申请人社交圈与工作地不匹配",
+					"argument": [{
+							"left": "居住时段居住地址偏移量",
+							"optional": [
+								"(0,2)",
+								"(2,5)",
+								"(5,+)"
+							],
+							"oper": "=",
+							"right": "(0,2)"
+						},
+						{
+							"left": "工作地址和居住地址相距",
+							"oper": ">",
+							"right": "40"
+						}
+					],
+					"ruleType": "PERSONALINFO"
+				},
+				"com.godsuy.mogo.bigdata.ruleengine.rule.RealContact": {
+					"ruleDescribe": "",
+					"ruleTitle": "订单联系人验真",
+					"argument": [{
+						"left": "异常联系人占比",
+						"oper": ">",
+						"right": 0.5
+					}],
+					"ruleType": "CONTACTINFO"
+				},
+				"com.godsuy.mogo.bigdata.ruleengine.rule.WorkAddressDegree": {
+					"ruleDescribe": "",
+					"argument": [{
+						"left": "工作地址可信程度",
+						"oper": ">",
+						"right": 0.8
+					}],
+					"ruleType": "PERSONALINFO",
+					"ruleTitle": "工作地址真实程度"
+				}
+			}
+			var results = [{
+				"ruleTitle": "高风险",
+				"ruleType": "HIGH"
+			}, {
+				"ruleTitle": "中风险",
+				"ruleType": "MIDDLE"
+			}, {
+				"ruleTitle": "低风险",
+				"ruleType": "LOW"
+			}]
+			$(function() {
+				var ruleBox = $('#centermain ul');
+				ruleBox.html('');
+				$.each(rulelist, function(key, rule) {
+					var ruleData = $.extend(true, {}, rule);
+					ruleData.type = "RULE";
+					ruleData.ruleClass = key;
+					var $li = $('<li></li>').appendTo(ruleBox);
+					var $rule = $('<div class="drag" draggable="true">' + ruleData.ruleTitle + '</div>').data('ruleData', ruleData).appendTo($li);
+				});
+				$.each(results, function(key, res) {
+					var resData = $.extend(true, {}, res);
+					resData.type = "TERMINAL";
+					resData.ruleClass = resData.ruleType;
+					var $li = $('<li></li>').appendTo(ruleBox);
+					var $rule = $('<div class="drag" draggable="true">' + resData.ruleTitle + '</div>').data('ruleData', resData).appendTo($li);
+				});
+				$('.drag', ruleBox).on({
+					dragstart: function(e) {
+						//需要传递三个参数 ruleTitle,type,ruleClass
+						var ruleData = $(e.target).data('ruleData');
+						var objstr = JSON.stringify(ruleData);
+						e.originalEvent.dataTransfer.setData("text", objstr);
+					}
+				});
+			});
+		</script>
+	</body>
+
+</html>
