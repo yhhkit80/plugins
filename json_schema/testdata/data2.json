@@ -1,0 +1,60 @@
+{
+	"Net": [],
+	"P2P": {
+		"score": "0",
+		"origin": {}
+	},
+	"Base": {
+		"point": "1741",
+		"custName": "戴树林",
+		"openTime": "2005年08月16日",
+		"operName": "chinaunicom",
+		"provName": "重庆",
+		"mobileAge": "144",
+		"create_date": "1503981826943",
+		"update_date": "1503981826943"
+	},
+	"Mark": "无标识",
+	"Bills": {
+		"201703": "128.20",
+		"201704": "112.80",
+		"201705": "127.90",
+		"201706": "145.00",
+		"201707": "184.29"
+	},
+	"Mobile": "13102311670",
+	"SMSList": [],
+	"Assemble": {
+		"P2P": 1503979975247,
+		"Base": 1503981831809,
+		"Mark": 1503981826866,
+		"Bills": 1503981846890,
+		"Mobile": 1503981826866,
+		"Payments": 1503981833987
+	},
+	"CallList": [],
+	"Negative": {},
+	"Payments": [
+		{
+			"date": "2017-07-31",
+			"amount": "0.00",
+			"paymentType": "",
+			"paymentSource": "ESS营业缴费"
+		}
+	],
+	"Traffics": [],
+	"MobileMsg": "用户已验证",
+	"RiskLevel": {
+		"score": "0",
+		"origin": {}
+	},
+	"BadnessBlack": {
+		"score": "0",
+		"origin": {}
+	},
+	"CarLoanBlack": {
+		"score": "0",
+		"origin": []
+	},
+	"isUpdateNeo4j": "true"
+}

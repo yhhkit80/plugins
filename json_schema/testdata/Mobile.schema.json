@@ -1,0 +1,582 @@
+{
+	"type": "object",
+	"title": "MobileScheme",
+	"description": "描述一个Mobile的模型应该传输的字段KEY和Value的类型",
+	"properties": {
+		"Mobile": {
+			"type": "string"
+		},
+		"Assemble": {
+			"type": "object",
+			"description": "手机信息拥有标识",
+			"additionalProperties": false,
+			"properties": {
+				"Mobile": {
+					"type": "integer"
+				},
+				"Base": {
+					"type": "integer"
+				},
+				"Mark": {
+					"type": "integer"
+				},
+				"Bills": {
+					"type": "integer"
+				},
+				"Payments": {
+					"type": "integer"
+				},
+				"ContactVefify" :{
+					"type": "integer"
+				},
+				"Aphase":{
+					"type" : "integer"
+				},
+				"CallList": {
+					"type": "integer"
+				},
+				"SMSList": {
+					"type": "integer"
+				},
+				"Traffics": {
+					"type": "integer"
+				},
+				"Net": {
+					"type": "integer"
+				},
+				"CarLoanBlack": {
+					"type": "integer"
+				},
+				"Negative": {
+					"type": "integer"
+				},
+				"P2P":{
+					"type":"integer"
+				},
+				"BadnessBlack":{
+					"type":"integer"
+				},
+				"RiskLevel":{
+					"type":"integer"
+				},
+				"Execution":{
+					"type":"integer"
+				},
+				"UserInformationVerification":{
+					"type":"integer"
+				},
+				"MobileConsumption":{
+					"type":"integer"
+				},
+				"Credit":{
+					"type":"integer"
+				},
+				"FriendCircleVerify":{
+					"type":"integer"
+				}
+			}
+		},
+		"Base": {
+			"type": "object",
+			"description": "手机基本信息",
+			"additionalProperties": false,
+			"properties": {
+				"custName": {
+					"type": "string",
+					"description": "姓名"
+				},
+				"openTime": {
+					"type": "string",
+					"description": "入网时间区间"
+				},
+				"mobileAge": {
+					"type": "string",
+					"description": "网龄"
+				},
+				"point": {
+					"type": "string",
+					"description": "积分"
+				},
+				"operName": {
+					"type": "string",
+					"description": "运营商名称"
+				},
+				"provName": {
+					"type": "string",
+					"description": "手机省份"
+				},
+				"data_souce": {
+					"type": "string",
+					"description": "数据来源"
+				},
+				"create_date": {
+					"type": "string",
+					"description": "创建时间"
+				},
+				"create_user": {
+					"type": "string",
+					"description": "创建人员"
+				},
+				"update_date": {
+					"type": "string",
+					"description": "更新时间"
+				},
+				"phonePlan": {
+					"type": "string",
+					"description": "套餐信息"
+				}
+			}
+		},
+		"MobileConsumption":{
+			"type": "object",
+			"description": "手机网龄及消费情况",
+			"additionalProperties": false,
+			"properties": {
+				"mobile": {
+					"type": "string",
+					"description": "手机号"
+				},
+				"mobileAge": {
+					"type": "string",
+					"description": "网龄区间"
+				},
+				"consumptionLevel": {
+					"type": "string",
+					"description": "消费水平区间"
+				}
+			}
+		},
+		"Credit":{
+			"type": "array",
+			"description": "信贷信息",
+			"items": {
+				"type": "object",
+				"additionalProperties": false,
+				"properties": {
+					"TYPE":{
+						"type":"string",
+						"description":"类型（EMR002：信贷平台注册详情；EMR004：贷款申请详情；EMR007：贷款放款详情；EMR009：贷款驳回详情；EMR012：逾期平台详情查询；EMR013：欠款查询）"
+					},
+					"CYCLE":{
+						"type":"string",
+						"description":"时间段"
+					},
+					"DATA":{
+						"type": "array",
+						"description": "信贷时间、类型、金额",
+						"items": {
+							"type": "object",
+							"additionalProperties": false,
+							"properties": {
+								"P_TYPE":{
+									"type":"string",
+									"description":"平台类型（1 银行；2 非银行）"
+								},
+								"PLATFORMCODE":{
+									"type":"string",
+									"description":"平台代码"
+								},
+								"REGISTERTIME":{
+									"type":"string",
+									"description":"平台注册时间"
+								},
+								"APPLICATIONTIME":{
+									"type":"string",
+									"description":"申请贷款的时间"
+								},
+								"APPLICATIONAMOUNT":{
+									"type":"string",
+									"description":"申请贷款的金额区间"
+								},
+								"APPLICATIONRESULT":{
+									"type":"string",
+									"description":"申请结果"
+								},
+								"LOANLENDERSTIME":{
+									"type":"string",
+									"description":"贷款放款的时间"
+								},
+								"LOANLENDERSAMOUNT":{
+									"type":"string",
+									"description":"贷款放款金额区间"
+								},
+								"REJECTIONTIME":{
+									"type":"string",
+									"description":"贷款驳回时间"
+								},
+								"PLATFORM":{
+									"type":"string",
+									"description":"逾期（欠款）平台代码"
+								},
+								"COUNTS":{
+									"type":"string",
+									"description":"查询时间范围内发生逾期的总次数"
+								},
+								"MONEY":{
+									"type":"string",
+									"description":"逾期（欠款）金额区间"
+								},
+								"D_TIME":{
+									"type":"string",
+									"description":"最近逾期时间"
+								}
+							}
+						}
+					}
+					
+				}
+			}
+		},
+		"MobileMsg":{
+			"type": "string",
+			"description": "运营商验证情况"
+		},
+		"isUpdateNeo4j": {
+			"type": "boolean",
+			"description": "是否需要同步Neo4j"
+		},
+		"Mark": {
+			"type": "string",
+			"description": "互联网标识"
+		},
+		"Bills": {
+			"type": "object",
+			"description": "账单信息",
+			"patternProperties": {
+				"^((?:19|20)\\d\\d)(0[1-9]|1[012])$": {
+					"type": "string",
+					"description": "月账单。例如：201701:\"88.8\""
+				}
+			},
+			"additionalProperties": false
+		},
+		"Payments": {
+			"type": "array",
+			"description": "充值记录",
+			"items": {
+				"type": "object",
+				"properties": {
+					"amount": {
+						"type": "string",
+						"description": "金额"
+					},
+					"date": {
+						"type": "string",
+						"description": "充值时间"
+					},
+					"paymentSource": {
+						"type": "string",
+						"description": "充值来源"
+					},
+					"paymentType": {
+						"type": "string",
+						"description": "充值方式"
+					}
+				},
+				"additionalProperties": false
+			}
+		},
+		"ContactVefify" :{
+			"type": "array",
+			"description": "联系情况",
+			"items": {
+				"type": "object",
+				"properties": {
+					"mobile": {
+						"type": "string",
+						"description": "联系人电话号码"
+					},
+					"realation": {
+						"type": "string",
+						"description": "与主贷人之间的关系，例如：Spouse : 配偶   ,Relatives : 直系亲属   ,Friend : 朋友   ,EContact : 亲戚  ,Workmate : 同事"
+					},
+					"reality": {
+						"type": "boolean",
+						"description": "是否有过联系"
+					}
+				},
+				"additionalProperties": false
+			}
+		},
+		"Aphase" : {
+			"type": "string",
+			"description": "手机运营商详单短信验证码是否输入正确"
+		},
+		"CallList": {
+			"type": "array",
+			"description": "通话详单数据",
+			"items": {
+				"type": "object",
+				"additionalProperties": false,
+				"properties": {
+					"businessType": {
+						"type": "string",
+						"description": "业务类型"
+					},
+					"callBegainTime": {
+						"type": "string",
+						"description": "通话开始时间"
+					},
+					"callDuration": {
+						"type": "string",
+						"description": "通话时间(秒)"
+					},
+					"callType": {
+						"type": "string",
+						"description": "呼叫类型"
+					},
+					"otherNumber": {
+						"type": "string",
+						"description": "对方号码"
+					},
+					"calledhome": {
+						"type": "string",
+						"description": "本机通话地址"
+					},
+					"communicationType": {
+						"type": "string",
+						"description": "通话类型"
+					},
+					"packagefree": {
+						"type": "string",
+						"description": "套餐描述"
+					},
+					"ortherLocation": {
+						"type": "string",
+						"description": "对方通话地址"
+					},
+					"longDistanceFee": {
+						"type": "string",
+						"description": "长途话费(元)"
+					},
+					"isNewCall": {
+						"type": "string",
+						"description": "是否新通话"
+					},
+					"communicationFee": {
+						"type": "string",
+						"description": "话费(元)"
+					}
+				}
+			}
+		},
+		"SMSList": {
+			"type": "array",
+			"description": "短信详单数据",
+			"items": {
+				"type": "object",
+				"properties": {
+					"time": {
+						"type": "string",
+						"description": "开始时间"
+					},
+					"businessType": {
+						"type": "string",
+						"description": "业务类型"
+					},
+					"transferType": {
+						"type": "string",
+						"description": "传送方式"
+					},
+					"otherNumber": {
+						"type": "string",
+						"description": "对方号码"
+					},
+					"messageType": {
+						"type": "string",
+						"description": "信息类型"
+					},
+					"messgeFee": {
+						"type": "string",
+						"description": "金额(单位元)"
+					}
+				},
+				"additionalProperties": false
+			}
+		},
+		"Traffics": {
+			"type": "array",
+			"description": "流量详单数据",
+			"items": {
+				"type": "object",
+				"properties": {
+					"networkType": {
+						"type": "string",
+						"description": "网络类型"
+					},
+					"onlineDuration": {
+						"type": "string",
+						"description": "上网时长单位秒"
+					},
+					"onlineType": {
+						"type": "string",
+						"description": "上网方式"
+					},
+					"chargeType": {
+						"type": "string",
+						"description": "计费类型"
+					},
+					"isRedict": {
+						"type": "string",
+						"description": "是否定向"
+					},
+					"beginTime": {
+						"type": "string",
+						"description": "开始时间"
+					},
+					"totalTraffic": {
+						"type": "string",
+						"description": "总流量KB"
+					},
+					"location": {
+						"type": "string",
+						"description": "通讯地址"
+					},
+					"trafficFee": {
+						"type": "string",
+						"description": "费用(单位元)"
+					}
+				},
+				"additionalProperties": false
+			}
+		},
+		"Net": {
+			"type": "array",
+			"description": "上网记录详单数据",
+			"items": {
+				"type": "object",
+				"additionalProperties": false,
+				"properties": {
+					"businessType": {
+						"type": "string",
+						"description": "业务类型"
+					},
+					"networkType": {
+						"type": "string",
+						"description": "流量类型"
+					},
+					"visitWebsite": {
+						"type": "string",
+						"description": "访问地址"
+					},
+					"websiteNmae": {
+						"type": "string",
+						"description": "网址名称"
+					}
+				}
+			}
+		},
+		"CarLoanBlack": {
+			"type": "object",
+			"description": "车贷黑名单记录",
+			"additionalProperties": false,
+			"properties": {
+				"score": {
+					"type": "string"
+				},
+				"origin": {
+					"type": [
+						"object",
+						"string",
+						"array"
+					]
+				}
+			}
+		},
+		"Negative": {
+			"type": "object",
+			"description": "手机负面信息",
+			"additionalProperties": false,
+			"properties": {
+				"score": {
+					"type": "string"
+				},
+				"origin": {
+					"type": "array",
+					"description": "负面信息(数组形式)"
+				}
+			}
+		},
+		"P2P":{
+			"type": "object",
+			"description": "网贷黑名单",
+			"additionalProperties": false,
+			"properties": {
+				"score": {
+					"type": "string"
+				},
+				"origin":{
+					"type":["object","string","array"]
+				}
+			}
+		},
+		"RiskLevel":{
+			"type": "object",
+			"description": "风险等级",
+			"additionalProperties": false,
+			"properties": {
+				"score": {
+					"type": "string"
+				},
+				"origin":{
+					"type":["object","string","array"]
+				}
+			}
+		},
+		"BadnessBlack":{
+			"type": "object",
+			"description": "个人不良记录",
+			"additionalProperties": false,
+			"properties": {
+				"score": {
+					"type": "string"
+				},
+				"origin":{
+					"type":["object","string","array"]
+				}
+			}
+		},
+		"Execution":{
+			"type": "object",
+			"description": "被执行人信息",
+			"additionalProperties": false,
+			"properties": {
+				"score": {
+					"type": "string"
+				},
+				"origin":{
+					"type":["object","string","array"]
+				}
+			}
+		},
+		"FriendCircleVerify":{
+			"type": "object",
+			"description": "朋友圈验真",
+			"additionalProperties": false,
+			"properties": {
+				"mobile": {
+					"type": "string"
+				},
+				"certNo":{
+					"type": "string"
+				},
+				"certName":{
+					"type": "string"
+				},
+				"longitude":{
+					"type": "string"
+				},
+				"latitude":{
+					"type": "string"
+				},
+				"theOffset":{
+					"type": "string"
+				},
+				"status":{
+					"type": "string"
+				}
+			}
+		}
+	},
+	"additionalProperties": false
+}

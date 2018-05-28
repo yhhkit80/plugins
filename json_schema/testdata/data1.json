@@ -1,0 +1,86 @@
+{
+	"Net": [],
+	"uu": [],
+	"P2P": {
+		"score": "0",
+		"origin": {}
+	},
+	"Base": {
+		"point": "1916",
+		"custName": "王志强",
+		"openTime": "2007年04月25日",
+		"operName": "chinaunicom",
+		"provName": "天津",
+		"mobileAge": "125",
+		"create_date": "1506926579062",
+		"update_date": "1506926579062"
+	},
+	"Mark": "无标识",
+	"Bills": {
+		"201705": "0",
+		"201706": "0",
+		"201707": "0",
+		"201708": "0",
+		"201709": "0"
+	},
+	"Mobile": "13102188110",
+	"SMSList": [],
+	"Assemble": {
+		"P2P": 1506926505872,
+		"Base": 1506926581949,
+		"Mark": 1506926578950,
+		"Bills": 1506926591314,
+		"Mobile": 1506926578950,
+		"Payments": 1506926584989
+	},
+	"CallList": [],
+	"Negative": {},
+	"Payments": [
+		{
+			"date": "2017-10-01",
+			"amount": "50.00",
+			"paymentType": "",
+			"paymentSource": "续费卡系统"
+		}, {
+			"date": "2017-09-01",
+			"amount": "50.00",
+			"paymentType": "",
+			"paymentSource": "续费卡系统"
+		}, {
+			"date": "2017-08-01",
+			"amount": "50.00",
+			"paymentType": "",
+			"paymentSource": "续费卡系统"
+		}, {
+			"date": "2017-07-01",
+			"amount": "50.00",
+			"paymentType": "",
+			"paymentSource": "续费卡系统"
+		}, {
+			"date": "2017-05-31",
+			"amount": "50.00",
+			"paymentType": "",
+			"paymentSource": "代理商收费渠道"
+		}, {
+			"date": "2017-05-01",
+			"amount": "50.00",
+			"paymentType": "",
+			"paymentSource": "续费卡系统"
+		}
+	],
+	"Traffics": [],
+	"MobileMsg": "用户已验证",
+	"RiskLevel": {
+		"score": "0",
+		"origin": {}
+	},
+	"BadnessBlack": {
+		"score": "0",
+		"origin": {}
+	},
+	"CarLoanBlack": {
+		"score": "0",
+		"origin": []
+	},
+	"isUpdateNeo4j": "true"
+}

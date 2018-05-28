@@ -1,0 +1,414 @@
+<!doctype html>
+<html lang="en">
+
+	<head>
+		<meta charset="UTF-8">
+		<title>JSON Schema</title>
+		<style type="text/css">
+			html,
+			body {
+				height: 100%
+			}
+			
+			body {
+				font-family: Menlo, Monaco, Consolas, "Helvetica Neue", Helvetica, "Courier New", '微软雅黑', monospace, Arial, sans-serif, '黑体';
+				color: #555;
+				line-height: 24px;
+			}
+			
+			a {
+				display: inline-block;
+				text-decoration: none;
+				font-family: Menlo, Monaco, Consolas, '微软雅黑';
+				color: #29abe2;
+			}
+			
+			.icon {
+				display: inline-block;
+				width: 20px;
+				height: 18px;
+				line-height: 18px;
+				text-align: center;
+				font-style: normal;
+				font-size: inherit;
+				text-rendering: auto;
+				font-size: 16px;
+				color: blue;
+				-webkit-font-smoothing: antialiased;
+				-moz-osx-font-smoothing: grayscale;
+				background-color: #efefef;
+			}
+			
+			.icon-minus:before {
+				content: '-';
+				display: block;
+			}
+			
+			.icon-plus:before {
+				content: '+';
+				display: block;
+			}
+			
+			.json_key {
+				color: #92278f;
+				font-weight: bold;
+			}
+			
+			.json_null {
+				color: #f1592a;
+				font-weight: bold;
+			}
+			
+			.json_string {
+				color: #3ab54a;
+				font-weight: bold;
+				font-size: 15px;
+			}
+			
+			.json_number {
+				color: #25aae2;
+				font-weight: bold;
+				font-size: 15px;
+			}
+			
+			.json_link {
+				color: #717171;
+				font-weight: bold;
+			}
+			
+			.json_tip {
+				color: #999999;
+				font-size: 14px;
+			}
+			
+			.json_required {
+				margin-left: -1em;
+				color: #f00;
+				font-size: 14px;
+			}
+			
+			.json_random {
+				color: #c27ba0;
+				font-weight: bold;
+				font-size: 15px;
+			}
+			
+			.json_array_brackets {}
+			
+			.loading {
+				position: fixed;
+				top: 0;
+				bottom: 0;
+				left: 0;
+				right: 0;
+				margin-top: -50px;
+				background: rgba(0, 0, 0, .2);
+			}
+			
+			.loading-text {
+				position: absolute;
+				top: 50%;
+				bottom: 0;
+				left: 0;
+				right: 0;
+				font-size: 36px;
+				margin-top: -50px;
+				line-height: 100px;
+				text-align: center;
+			}
+			
+			.hidden {
+				display: none!important;
+			}
+			
+			.dot {
+				display: inline-block;
+				height: 1em;
+				line-height: 1;
+				text-align: left;
+				vertical-align: -.25em;
+				overflow: hidden;
+			}
+			
+			.dot::before {
+				display: block;
+				content: '......\A.....\A....\A...\A..\A.';
+				white-space: pre-wrap;
+				/* 也可以是white-space: pre */
+				animation: dot 3s infinite step-start both;
+				-ms-animation: dot 3s infinite step-start both;
+				-moz-animation: dot 3s infinite step-start both;
+				-webkit-animation: dot 3s infinite step-start both;
+				-o-animation: dot 3s infinite step-start both;
+			}
+			
+			@keyframes dot {
+				17% {
+					transform: translateY(-5em);
+				}
+				33% {
+					transform: translateY(-4em);
+				}
+				50% {
+					transform: translateY(-3em);
+				}
+				66% {
+					transform: translateY(-2em);
+				}
+				83% {
+					transform: translateY(-1em);
+				}
+			}
+			
+			@-webkit-keyframes dot {
+				17% {
+					-webkit-transform: translateY(-5em);
+				}
+				33% {
+					-webkit-transform: translateY(-4em);
+				}
+				50% {
+					-webkit-transform: translateY(-3em);
+				}
+				66% {
+					-webkit-transform: translateY(-2em);
+				}
+				83% {
+					-webkit-transform: translateY(-1em);
+				}
+			}
+			
+			@-ms-keyframes dot {
+				17% {
+					-ms-transform: translateY(-5em);
+				}
+				33% {
+					-ms-transform: translateY(-4em);
+				}
+				50% {
+					-ms-transform: translateY(-3em);
+				}
+				66% {
+					-ms-transform: translateY(-2em);
+				}
+				83% {
+					-ms-transform: translateY(-1em);
+				}
+			}
+			
+			@-moz-keyframes dot {
+				17% {
+					-moz-transform: translateY(-5em);
+				}
+				33% {
+					-moz-transform: translateY(-4em);
+				}
+				50% {
+					-moz-transform: translateY(-3em);
+				}
+				66% {
+					-moz-transform: translateY(-2em);
+				}
+				83% {
+					-moz-transform: translateY(-1em);
+				}
+			}
+			
+			@-o-keyframes dot {
+				17% {
+					-o-transform: translateY(-5em);
+				}
+				33% {
+					-o-transform: translateY(-4em);
+				}
+				50% {
+					-o-transform: translateY(-3em);
+				}
+				66% {
+					-o-transform: translateY(-2em);
+				}
+				83% {
+					-o-transform: translateY(-1em);
+				}
+			}
+		</style>
+	</head>
+
+	<body>
+		<div class="loading"><span class="loading-text">正在加载中<span class="dot"></span></span>
+		</div>
+		<div id="actualDataContainer" class="hidden"></div>
+
+		<script src="./js/zepto.js"></script>
+		<script>
+			var ActualDataFormat = (function() {
+				var _toString = Object.prototype.toString;
+
+				function format(model, object, indent_count) {
+					model = model || {}
+					var html_fragment = '';
+					var type = _toString.call(object)
+					switch(type) {
+						case '[object Null]':
+							html_fragment = _format_null(object);
+							break;
+						case '[object Boolean]':
+							html_fragment = _format_boolean(object);
+							break;
+						case 'integer':
+							html_fragment = _format_number(object);
+							break;
+						case '[object Number]':
+							html_fragment = _format_number(object);
+							break;
+						case '[object String]':
+							html_fragment = _format_string(object);
+							break;
+						case '[object Array]':
+							html_fragment = _format_array(model, object, indent_count);
+							break;
+						case '[object Object]':
+							html_fragment = _format_object(model, object, indent_count);
+							break;
+						default:
+							html_fragment = _format_random(object);
+							break;
+					}
+					return html_fragment;
+				}
+
+				function _format_null(object) {
+					return '<span class="json_null">' + object + '</span>';
+				}
+
+				function _format_boolean(object) {
+					return '<span class="json_boolean">' + object + '</span>';
+				}
+
+				function _format_random(object) {
+					return '<span class="json_boolean">' + object + '</span>';
+				}
+
+				function _format_number(object) {
+					return '<span class="json_number">' + object + '</span>';
+				}
+
+				function _format_string(object) {
+					return '<span class="json_string">"' + object + '"</span>';
+				}
+
+				function _format_array(model, object, indent_count) {
+					var tmp_array = [],
+						obj = object;
+					if(obj) {
+						var nModel = model.items || {}
+						var desc = nModel.description ? '<span class="json_tip">&nbsp;&nbsp;//' + nModel.description + '&nbsp;</span>' : '<span class="json_tip">&nbsp;&nbsp;//没有描述&nbsp;</span>';
+						for(var i in obj) {
+							tmp_array.push(indent_tab(indent_count) + format(nModel, obj[i], indent_count + 1) + '' + desc)
+						}
+						return '<span data-type="array" data-size="' + tmp_array.length + '"><i  style="cursor:pointer;" class="icon icon-minus" onclick="hide(this)"></i>' +
+							'[<br/>' +
+							tmp_array.join(',<br/>') + '' +
+							'<br/>' + indent_tab(indent_count - 1) + ']</span>';
+					} else {
+						return '<span data-type="array" data-size="' + 0 + '"><i  style="cursor:pointer;" class="icon icon-minus" onclick="hide(this)"></i>' +
+							'[' + '' + indent_tab(indent_count - 1) + ']</span>';
+					}
+				}
+
+				function _format_object(model, object, indent_count) {
+					var tmp_array = [];
+					var obj = object,
+						requiredArray = '';
+					if(!obj) obj = {};
+					var objLength = getObjLength(obj);
+					for(var key in obj) {
+						var nModel = model.properties ? model.properties[key] : {}
+						var objDesc = nModel && nModel.description ? '<span class="json_tip">&nbsp;&nbsp;//' + nModel.description + '&nbsp;</span>' : '<span class="json_tip">&nbsp;&nbsp;//没有描述&nbsp;</span>';
+						var requiredFlag = requiredArray && requiredArray.indexOf(key) > -1 ? '<span class="json_required">* </span>' : '';
+						tmp_array.push(indent_tab(indent_count) + requiredFlag +
+							'<span class="json_key">"' + key + '"</span>:' +
+							format(nModel, obj[key], indent_count + 1) +
+							(tmp_array.length < (objLength - 1) ? ',' : '') +
+							objDesc);
+					}
+					var pushText = tmp_array.length > 0 ? '<br/>' + tmp_array.join('<br>') + '<br/>' : '';
+					return '<span  data-type="object"><i  style="cursor:pointer;" class="icon icon-minus" onclick="hide(this)"></i>{' +
+						pushText + indent_tab(indent_count - 1) + '}</span>'
+				}
+
+				function indent_tab(indent_count) {
+					return(new Array(indent_count + 1)).join('&nbsp;&nbsp;&nbsp;&nbsp;');
+				}
+
+				function getObjLength(obj) {
+					var i = 0;
+					for(var key in obj) {
+						i++;
+					}
+					return i;
+				}
+				var _JSONFormat = function(origin_data, model) {
+					this.data = JSON.parse(origin_data);
+					this.model = model || {};
+				};
+				_JSONFormat.prototype = {
+					constructor: ActualDataFormat,
+					toString: function() {
+						var desc = this.model.description ?
+							'<span class="json_tip">&nbsp;&nbsp;//' + this.model.description + '&nbsp;</span>' :
+							'';
+						return format(this.model, this.data, 1) + desc;
+					}
+				}
+				return _JSONFormat;
+			})();
+
+			function hide(obj) {
+				var data_type = obj.parentNode.getAttribute('data-type');
+				var data_size = obj.parentNode.getAttribute('data-size');
+				obj.parentNode.setAttribute('data-inner', obj.parentNode.innerHTML);
+				if(data_type === 'array') {
+					obj.parentNode.innerHTML = '<i  style="cursor:pointer;" class="icon icon-plus" onclick="show(this)"></i>Array[<span class="json_number">' + data_size + '</span>]';
+				} else {
+					obj.parentNode.innerHTML = '<i  style="cursor:pointer;" class="icon icon-plus" onclick="show(this)"></i>Object{...}';
+				}
+			}
+
+			function show(obj) {
+				var innerHtml = obj.parentNode.getAttribute('data-inner');
+				obj.parentNode.innerHTML = innerHtml;
+			} //渲染实际数据
+			function renderActualData(content, model) {
+				model = model || {};
+				var current_json = '';
+				var current_json_str = '';
+				var result = '';
+				if(content != '' && content != undefined) {
+					try {
+						current_json_str = JSON.stringify(content);
+						result = new ActualDataFormat(current_json_str, model).toString();
+					} catch(e) {
+						result = '<span style="color: #f1592a;font-weight:bold;">' + e + '</span>';
+						current_json_str = result;
+					}
+					//result = '<h2 style="color:red;" >' + (model.title || 'Actual Data') + '</h2>' + result;
+					result = '<h2 style="color:red;" >' + 'Actual Data' + '</h2>' + result;
+					document.getElementById('actualDataContainer').innerHTML = result;
+				} else {
+					document.getElementById('actualDataContainer').innerHTML = '<h3> 未定义 </h3>';
+				}
+			}
+			$(function() {
+				$.get('./testdata/Mobile.schema.json', function(model) {
+					$.get('./testdata/data1.json', function(res) {
+						renderActualData(res, model)
+						$('.loading').addClass('hidden')
+						$('#actualDataContainer').removeClass('hidden')
+					})
+				})
+			})
+		</script>
+	</body>
+
+</html>

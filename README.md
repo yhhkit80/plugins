@@ -10,7 +10,8 @@ erselect: 下拉框组件
 erThreeValueSlider: 三段式滑块  
 io: 图片压缩工具 
 
-项目开发中使用的部分demo：  
+项目开发中使用的部分代码及demo：  
 
 scrollNotice: 滚动通知demo  
 compass: 分数罗盘demo  
+json_schema: 将schema定义的内容在页面中以json加注释形式显示  

@@ -1,0 +1,558 @@
+<!doctype html>
+<html lang="en">
+
+	<head>
+		<meta charset="UTF-8">
+		<title>JSON Schema</title>
+		<style type="text/css">
+			body {
+				font-family: Menlo, Monaco, Consolas, "Helvetica Neue", Helvetica, "Courier New", '微软雅黑', monospace, Arial, sans-serif, '黑体';
+				color: #555;
+				line-height: 24px;
+			}
+			
+			a {
+				display: inline-block;
+				text-decoration: none;
+				font-family: Menlo, Monaco, Consolas, '微软雅黑';
+				color: #29abe2;
+			}
+			
+			.icon {
+				display: inline-block;
+				width: 20px;
+				height: 18px;
+				line-height: 18px;
+				text-align: center;
+				font-style: normal;
+				font-size: inherit;
+				text-rendering: auto;
+				font-size: 16px;
+				color: blue;
+				-webkit-font-smoothing: antialiased;
+				-moz-osx-font-smoothing: grayscale;
+				background-color: #efefef;
+			}
+			
+			.icon-minus:before {
+				content: '-';
+				display: block;
+			}
+			
+			.icon-plus:before {
+				content: '+';
+				display: block;
+			}
+			
+			.json_key {
+				color: #92278f;
+				font-weight: bold;
+			}
+			
+			.json_null {
+				color: #f1592a;
+				font-weight: bold;
+			}
+			
+			.json_string {
+				color: #3ab54a;
+				font-weight: bold;
+				font-size: 15px;
+			}
+			
+			.json_number {
+				color: #25aae2;
+				font-weight: bold;
+				font-size: 15px;
+			}
+			
+			.json_link {
+				color: #717171;
+				font-weight: bold;
+			}
+			
+			.json_tip {
+				color: #999999;
+				font-size: 14px;
+			}
+			
+			.json_required {
+				margin-left: -1em;
+				color: #f00;
+				font-size: 14px;
+			}
+			
+			.json_random {
+				color: #c27ba0;
+				font-weight: bold;
+				font-size: 15px;
+			}
+			
+			.json_array_brackets {}
+		</style>
+	</head>
+
+	<body>
+		<div id="json-title"></div>
+		<hr />
+		<div id="json-description"></div>
+		<hr />
+		<div id="json-request-params"></div>
+		<hr />
+		<div id="json-request-input"></div>
+		<hr />
+		<div id="json-response"></div>
+		<script>
+			var JSONFormat = (function() {
+				var _toString = Object.prototype.toString;
+
+				function format(object, indent_count) {
+					var html_fragment = '';
+					var typeIsArray = _toString.call(object.type) == '[object Array]';
+					if(typeIsArray) {
+						for(var i = 0; i < object.type.length; i++) {
+							html_fragment += format({
+								type: object.type[i]
+							}, indent_count + 1);
+							if(i != object.type.length - 1)
+								html_fragment += '&nbsp;&nbsp;||<br/>' + indent_tab(indent_count);
+						}
+					} else {
+						switch(object.type) {
+							case 'null':
+								html_fragment = _format_null(object);
+								break;
+							case 'boolean':
+								html_fragment = _format_boolean(object);
+								break;
+							case 'integer':
+								html_fragment = _format_number(object);
+								break;
+							case 'number':
+								html_fragment = _format_number(object);
+								break;
+							case 'string':
+								html_fragment = _format_string(object);
+								break;
+							case 'array':
+								html_fragment = _format_array(object, indent_count);
+								break;
+							case 'object':
+								html_fragment = _format_object(object, indent_count);
+								break;
+							default:
+								html_fragment = _format_random(object);
+								break;
+						}
+					}
+					return html_fragment;
+				}
+
+				function _format_null(object) {
+					return '<span class="json_null">' + object.type + '</span>';
+				}
+
+				function _format_boolean(object) {
+					return '<span class="json_boolean">' + object.type + '</span>';
+				}
+
+				function _format_random(object) {
+					return '<span class="json_random">' + object.type + '</span>';
+				}
+
+				function _format_number(object) {
+					var text = object.type,
+						limitText = minText = maxText = '';
+					if(object.minimum !== undefined)
+						minText = object.minimum + (object.exclusiveMinimum === true ? '<' : '≤');
+					if(object.maximum !== undefined)
+						maxText = (object.exclusiveMaximum === true ? '<' : '≤') + object.maximum;
+					if(object.minimum !== undefined || object.maximum !== undefined)
+						limitText += minText + 'number' + maxText;
+					if(object.multipleOf !== undefined)
+						limitText += (limitText ? '; ' : '') + 'number%' + object.multipleOf + ' = 0';
+					if(limitText)
+						text += ' ( ' + limitText + ' )';
+					return '<span class="json_number">' + text + '</span>';
+				}
+
+				function _format_string(object) {
+					var text = object.type,
+						limitText = minText = maxText = '';
+					if(object.minLength !== undefined)
+						minText = object.minLength + '≤';
+					if(object.maxLength !== undefined)
+						maxText = '≤' + object.maxLength;
+					if(object.minLength !== undefined || object.maxLength !== undefined)
+						limitText += minText + 'string.length' + maxText;
+					if(object.pattern !== undefined)
+						limitText += (limitText ? '; ' : '') + '/' + object.pattern + '/';
+					if(limitText)
+						text += ' ( ' + limitText + ' )';
+					return '<span class="json_string">"' + text + '"</span>';
+				}
+
+				function _format_array(object, indent_count) {
+					var tmp_array = [],
+						obj = object.items,
+						limitText = minText = maxText = '';
+
+					var itemsDesc = obj && obj.description ?
+						'<span class="json_tip">&nbsp;&nbsp;//' + obj.description + '&nbsp;</span>' :
+						'';
+
+					if(object.minItems !== undefined) minText += object.minItems + '≤';
+					if(object.maxItems !== undefined) maxText += '≤' + object.maxItems;
+					if(object.minItems !== undefined || object.maxItems !== undefined)
+						limitText += minText + 'array.length' + maxText;
+					if(object.uniqueItems === true) limitText += (limitText ? '; ' : '') + '不能有重复值';
+					// if(object.additionalItems === false) limitText += ' json数据长度小于等于items长度'; 未用到
+					if(limitText) limitText = '<span class="json_tip"> /* ' + limitText + ' */ </span>';
+					if(obj) {
+						tmp_array.push(indent_tab(indent_count) + format(obj, indent_count + 1))
+						return '<span data-type="array" data-size="' + tmp_array.length + '"><i  style="cursor:pointer;" class="icon icon-minus" onclick="hide(this)"></i>' +
+							'[' + limitText + '<br/>' +
+							tmp_array.join(',<br/>') + itemsDesc +
+							'<br/>' + indent_tab(indent_count - 1) + ']</span>';
+					} else {
+						return '<span data-type="array" data-size="' + 0 + '"><i  style="cursor:pointer;" class="icon icon-minus" onclick="hide(this)"></i>' +
+							'[' + itemsDesc + indent_tab(indent_count - 1) + ']</span>';
+					}
+				}
+
+				function _format_object(object, indent_count) {
+					var tmp_array = [],
+						obj = object.properties,
+						patternObj = object.patternProperties,
+						requiredArray = object.required,
+						limitText = '',
+						objNumberText = '',
+						minText = '',
+						maxText = '';
+
+					if(object.additionalProperties === false) {
+						limitText = '<span class="json_tip"> /* 不允许附加属性 */ </span>';
+					} else {
+						if(!obj) obj = {};
+						obj['*'] = {
+							"type": "*",
+							"description": "任意属性"
+						};
+						if(object.minProperties !== undefined) minText += object.minProperties + '≤';
+						if(object.maxProperties !== undefined) maxText += '≤' + object.maxProperties;
+						if(object.minProperties !== undefined || object.maxProperties !== undefined)
+							objNumberText += minText + 'totalKeyNumber' + maxText;
+						limitText = objNumberText ? '<span class="json_tip"> /* ' + objNumberText + ' */ </span>' : '';
+					}
+					var objLength = getObjLength(obj),
+						patternObjLength = getObjLength(patternObj);
+
+					for(var key in obj) {
+						var objDesc = obj[key].description ? '<span class="json_tip">&nbsp;&nbsp;//' + obj[key].description + '&nbsp;</span>' : '';
+						var requiredFlag = requiredArray && requiredArray.indexOf(key) > -1 ? '<span class="json_required">* </span>' : '';
+						tmp_array.push(indent_tab(indent_count) + requiredFlag +
+							'<span class="json_key">"' + key + '"</span>:' +
+							format(obj[key], indent_count + 1) +
+							(tmp_array.length < (objLength + patternObjLength - 1) ? ',' : '') +
+							objDesc);
+					}
+					for(var key in patternObj) {
+						var objDesc = patternObj[key].description ?
+							'<span class="json_tip">&nbsp;&nbsp;//' + patternObj[key].description + '&nbsp;</span>' :
+							'';
+						tmp_array.push(indent_tab(indent_count) + '<span class="json_key">/' + key + '/</span>:' +
+							format(patternObj[key], indent_count + 1) + (tmp_array.length < (objLength + patternObjLength - 1) ? ',' : '') + objDesc);
+					}
+					var desc = object.description ?
+						'<br/><span class="json_tip">&nbsp;&nbsp;//' + object.description + '&nbsp;</span>' :
+						'';
+					var pushText = tmp_array.length > 0 ? limitText + '<br/>' + tmp_array.join('<br>') + '<br/>' :
+						limitText;
+					return '<span  data-type="object"><i  style="cursor:pointer;" class="icon icon-minus" onclick="hide(this)"></i>{' +
+						pushText + indent_tab(indent_count - 1) + '}</span>'
+				}
+
+				function indent_tab(indent_count) {
+					return(new Array(indent_count + 1)).join('&nbsp;&nbsp;&nbsp;&nbsp;');
+				}
+
+				function getObjLength(obj) {
+					var i = 0;
+					for(var key in obj) {
+						i++;
+					}
+					return i;
+				}
+				var _JSONFormat = function(origin_data) {
+					this.data = JSON.parse(origin_data);
+				};
+				_JSONFormat.prototype = {
+					constructor: JSONFormat,
+					toString: function() {
+						var desc = this.data.description ?
+							'<span class="json_tip">&nbsp;&nbsp;//' + this.data.description + '&nbsp;</span>' :
+							'';
+						return format(this.data, 1) + desc;
+					}
+				}
+				return _JSONFormat;
+			})();
+
+			function hide(obj) {
+				var data_type = obj.parentNode.getAttribute('data-type');
+				var data_size = obj.parentNode.getAttribute('data-size');
+				obj.parentNode.setAttribute('data-inner', obj.parentNode.innerHTML);
+				if(data_type === 'array') {
+					obj.parentNode.innerHTML = '<i  style="cursor:pointer;" class="icon icon-plus" onclick="show(this)"></i>Array[<span class="json_number">' + data_size + '</span>]';
+				} else {
+					obj.parentNode.innerHTML = '<i  style="cursor:pointer;" class="icon icon-plus" onclick="show(this)"></i>Object{...}';
+				}
+			}
+
+			function show(obj) {
+				var innerHtml = obj.parentNode.getAttribute('data-inner');
+				obj.parentNode.innerHTML = innerHtml;
+			}
+
+			function renderSchemaInput(content) {
+				var current_json = '';
+				var current_json_str = '';
+				var result = '';
+				if(content != '' && content != undefined) {
+					try {
+						current_json_str = JSON.stringify(content);
+						result = new JSONFormat(current_json_str, 4).toString();
+					} catch(e) {
+						result = '<span style="color: #f1592a;font-weight:bold;">' + e + '</span>';
+						current_json_str = result;
+					}
+					//result = '<h2>' + (content.title || 'JSON Schema') + '</h2>' + result;
+					result = '<h2>' + 'Input Schema' + '</h2>' + result;
+					document.getElementById('json-request-input').innerHTML = result;
+				} else {
+					document.getElementById('json-request-input').innerHTML = '<h3> 未定义 </h3>';
+				}
+			}
+
+			function renderSchemaParams(content) {
+				var current_json = '';
+				var current_json_str = '';
+				var result = '';
+				if(content != '' && content != undefined) {
+					try {
+						current_json_str = JSON.stringify(content);
+						result = new JSONFormat(current_json_str, 4).toString();
+					} catch(e) {
+						result = '<span style="color: #f1592a;font-weight:bold;">' + e + '</span>';
+						current_json_str = result;
+					}
+					//result = '<h2>' + (content.title || 'JSON Schema') + '</h2>' + result;
+					result = '<h2>' + 'Params Schema' + '</h2>' + result;
+					document.getElementById('json-request-params').innerHTML = result;
+				} else {
+					document.getElementById('json-request-params').innerHTML = '<h3> 未定义 </h3>';
+				}
+			}
+
+			function renderSchemaResponse(content) {
+				var current_json = '';
+				var current_json_str = '';
+				var result = '';
+				if(content != '' && content != undefined) {
+					try {
+						current_json_str = JSON.stringify(content);
+						result = new JSONFormat(current_json_str, 4).toString();
+					} catch(e) {
+						result = '<span style="color: #f1592a;font-weight:bold;">' + e + '</span>';
+						current_json_str = result;
+					}
+					//result = '<h2>' + (content.title || 'JSON Schema') + '</h2>' + result;
+					result = '<h2 style="color:red;" >' + 'Response Schema' + '</h2>' + result;
+					document.getElementById('json-response').innerHTML = result;
+				} else {
+					document.getElementById('json-response').innerHTML = '<h3> 未定义 </h3>';
+				}
+			}
+
+			function renderTitle(title) {
+				if(title != '' && title != undefined) {
+					document.getElementById('json-title').innerHTML = '<h1> ' + title + ' </h1>';
+					document.title = title;
+				} else {
+					document.getElementById('json-title').innerHTML = '<h1> 未定义 </h1>';
+					document.title = "";
+				}
+			}
+
+			function renderDescription(desc) {
+				if(desc != '' && desc != undefined) {
+					document.getElementById('json-description').innerHTML = '<h3> ' + desc + ' </h3>';
+				} else {
+					document.getElementById('json-description').innerHTML = '<h3> 未定义 </h3>';
+				}
+			}
+
+			function render(content) {
+				if(content == '' || content == undefined || content == null) return;
+				console.log("content Type :" + typeof(content) + " ,and content Info:" + content);
+				var json = content;
+				var title = json.title;
+				renderTitle(title);
+				var description = json.description;
+				renderDescription(description);
+				var input = json.input;
+				renderSchemaInput(input);
+				var params = json.params;
+				renderSchemaParams(params);
+				var response = json.response;
+				renderSchemaResponse(response);
+			}
+		</script>
+	</body>
+
+</html>
+<script type="text/javascript">
+	render({
+		"title": "推送数据接口描述",
+		"description": "描述数据推送对外接口应该传输的字段KEY和Value的类型，该接口以POST方式提交请求参数。(注：* 为必填项)",
+		"params": {
+			"type": "object",
+			"title": "RequestScheme",
+			"description": "商户的信息，商户信息放在请求连接后,例如：http://mogox.godsuy.com/front/OrderDetail_2_1_0/push.jjs?tenantID=godsuy&reqTime=1488198743012&sign=623649468e89645e4aa3524205730ad7",
+			"required": ["tenantID", "reqTime", "sign"],
+			"properties": {
+				"tenantID": {
+					"type": "string",
+					"description": "商户编号"
+				},
+				"reqTime": {
+					"type": "string",
+					"pattern": "^\\d{13}$",
+					"description": "请求时间"
+				},
+				"sign": {
+					"type": "string",
+					"pattern": "^[0-9a-zA-Z]{32}$",
+					"description": "商户签名"
+				}
+			},
+			"additionalProperties": false
+		},
+		"input": {
+			"type": "object",
+			"title": "查询参数",
+			"additionalProperties": false,
+			"required": ["orderID", "mainLoan"],
+			"properties": {
+				"orderID": {
+					"type": "string",
+					"description": "商户订单号(由您提供的订单号，可以用来做报告的查询)"
+				},
+				"mainLoan": {
+					"type": "object",
+					"description": "商户订单号(由您提供的订单号，可以用来做报告的查询)",
+					"required": ["loanCertNo", "loanCertName", "loanMobile", "unitAddress", "homeAddress"],
+					"properties": {
+						"loanCertType": {
+							"type": "string",
+							"description": "证件类型  1  表示身份证，默认为  1"
+						},
+						"loanCertNo": {
+							"type": "string",
+							"pattern": "^(\\d{15}$|^\\d{18}$|^\\d{17}(\\d|X))$",
+							"description": "主贷人证件号码(如最后一位为X请使用大写字母)"
+						},
+						"loanCertName": {
+							"type": "string",
+							"description": "主贷人姓名"
+						},
+						"loanMobile": {
+							"type": "string",
+							"description": "主贷人手机号"
+						},
+						"bankCard": {
+							"type": "string",
+							"description": "主贷人银行卡号"
+						},
+						"unitAddress": {
+							"type": "string",
+							"description": "主贷人单位地址"
+						},
+						"homeAddress": {
+							"type": "string",
+							"description": "主贷人家庭地址"
+						}
+					}
+				},
+				"contacts": {
+					"type": "array",
+					"title": "RequestScheme",
+					"description": "联系人信息,当添加联系人时，联系人姓名、电话、类型为必填项",
+					"items": {
+						"type": "object",
+						"required": ["contact_name", "contact_tel", "contact_type"],
+						"properties": {
+							"contact_id_type": {
+								"type": "string",
+								"description": "联系人证件类型,1 为身份证, 默认为  1"
+							},
+							"contact_id": {
+								"type": "string",
+								"description": "联系人证件号"
+							},
+							"contact_name": {
+								"type": "string",
+								"description": "联系人姓名"
+							},
+							"contact_tel": {
+								"type": "string",
+								"description": "联系电话"
+							},
+							"contact_type": {
+								"type": "string",
+								"description": "联系人类型，例如：Spouse : 配偶   ,Relatives ： 直系亲属   ,Friend : 朋友   ,EContact : 亲戚  ,Workmate : 同事"
+							}
+						}
+					}
+				},
+				"notifyURL": {
+					"type": "string",
+					"description": "回调商户地址(在Mogo云计算完成后将会调用此地址通知您数据已准备好)"
+				},
+				"aSMSChannel": {
+					"type": "string",
+					"description": "是否发送短信。1为发送短信(短信回直接发送给验证的手机号，内容是一个链接，点开链接是我们Seehoo提供的手机验证); 0  为不发送短信,默认为  0。"
+				}
+			}
+		},
+		"response": {
+			"type": "object",
+			"description": "推送数据返回结果状态信息",
+			"additionalProperties": false,
+			"properties": {
+				"status": {
+					"type": "boolean",
+					"description": "接口状态标识"
+				},
+				"code": {
+					"type": "string",
+					"description": "接口返回码"
+				},
+				"msg": {
+					"type": "string",
+					"description": "接口调用结果描述"
+				},
+				"content": {
+					"type": "object",
+					"description": "接口返回内容",
+					"properties": {
+						"mobileOrder": {
+							"type": "string",
+							"description": "运营商订单号。(该订单号可以用来拼装链接,让验证客户进行手机验证。例如：http://m.godsuy.com/cl/m/homepc.html?c=123456  其中123456为运营商订单号，此链接为PC版。http://m.godsuy.com/cl/m/homem.html?c=123456为手机版)"
+						}
+					}
+				}
+			}
+		}
+	});
+</script>

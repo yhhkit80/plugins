@@ -1,0 +1,72 @@
+{
+	"Net": [],
+	"P2P": {
+		"score": "0",
+		"origin": {}
+	},
+	"Base": {
+		"custName": "李彦保"
+	},
+	"Mark": "无标识",
+	"Bills": {},
+	"SMSList": [],
+	"Assemble": {
+		"P2P": 1512200477886,
+		"Mark": 1512200478527,
+		"Negative": 1512200477729,
+		"Execution": 1512200477913,
+		"ContactVefify": 1512200478928,
+		"MobileConsumption": 1512200477791,
+		"FriendCircleVerify": 1512200478017,
+		"UserInformationVerification": 1512200477746
+	},
+	"CallList": [],
+	"Negative": {
+		"score": "0",
+		"origin": []
+	},
+	"Payments": [],
+	"Traffics": [],
+	"Execution": {
+		"score": "0",
+		"origin": {}
+	},
+	"RiskLevel": {
+		"score": "0",
+		"origin": {}
+	},
+	"BadnessBlack": {
+		"score": "0",
+		"origin": {}
+	},
+	"CarLoanBlack": {
+		"score": "0",
+		"origin": []
+	},
+	"ContactVefify": [
+		{
+			"mobile": "13653190260",
+			"reality": true,
+			"realation": "Friend"
+		}, {
+			"mobile": "15732911548",
+			"reality": false,
+			"realation": "Relatives"
+		}
+	],
+	"isUpdateNeo4j": "true",
+	"MobileConsumption": {
+		"mobile": "13102559809",
+		"mobileAge": "(24,+)",
+		"consumptionLevel": "(40,80]"
+	},
+	"FriendCircleVerify": {
+		"certNo": "132233197806060637",
+		"mobile": "13102559809",
+		"status": "0000",
+		"certName": "李彦保",
+		"latitude": "",
+		"longitude": "河北省邢台市广宗县件只乡安湾头村委会村杰青家农场",
+		"theOffset": "(0,2]"
+	}
+}
