@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+
+	<head>
+		<meta charset="UTF-8">
+		<title>ImageOptim</title>
+		<link rel="stylesheet" href="css/index.css">
+		<script src="./js/jquery-3.2.1.min.js"></script>
+		<script src="./js/sha256.min.js"></script>
+		<script src="./js/ImageOptim.js"></script>
+		<script src="./js/zip/zip.js"></script>
+		<script src="./js/zip/mime-types.js"></script>
+		<script src="./js/zip/ZipArchive.js"></script>
+		<script src="./js/io.js"></script>
+		<style>
+			.mfile .mfile-delete,
+			.mfile .mfile-download {
+				bottom: 5px;
+			}
+			
+			.mfile-download {
+				right: 30px;
+			}
+			
+			.mfile:hover .mfile-download:not(.disabled) {
+				display: block;
+				left: auto;
+				right: 30px;
+			}
+			
+			input {
+				margin: 0;
+				font: inherit;
+				color: inherit;
+				font-family: inherit;
+				font-size: inherit;
+				line-height: inherit;
+				-webkit-appearance: textfield;
+				background-color: white;
+				-webkit-rtl-ordering: logical;
+				cursor: text;
+				padding: 1px;
+				border-width: 2px;
+				border-style: inset;
+				border-color: initial;
+				border-image: initial;
+				box-sizing: border-box;
+			}
+			
+			#left_fieldset {
+				height: calc(100% - 218px);
+			}
+			
+			.config-form {
+				width: 100%;
+				height: 150px;
+				margin-bottom: 10px;
+				border-radius: 5px;
+				box-sizing: border-box;
+				padding: 5px;
+				border: 1px solid #d8d8d8;
+				background-color: #ffffff;
+				box-shadow: 2px 2px 8px #cccccc;
+			}
+			
+			.config-form h3 {
+				font-size: 18px;
+				text-indent: 20px;
+			}
+			
+			.config-form h3 span {
+				display: inline-block;
+				font-size: 12px;
+				color: #999999;
+			}
+			
+			.config-table {
+				width: 100%;
+				padding: 10px;
+				box-sizing: border-box;
+			}
+			
+			.config-table td {
+				height: 28px;
+				overflow: hidden;
+			}
+			
+			.label {
+				width: 80px;
+				text-align: right;
+			}
+			
+			.input {
+				display: inline-block;
+				width: 200px;
+				max-width: 50%;
+				height: 28px;
+				padding: 5px 12px;
+				font-size: 12px;
+				line-height: 1.42857143;
+				color: #555;
+				background-color: #fff;
+				background-image: none;
+				border: 1px solid #ccc;
+				border-radius: 4px;
+				-webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
+				box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
+				-webkit-transition: border-color ease-in-out .15s, -webkit-box-shadow ease-in-out .15s;
+				-o-transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+				transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+			}
+			
+			.input-tip {
+				display: inline-block;
+				height: 28px;
+				line-height: 1.42857143;
+				padding: 5px 12px;
+				box-sizing: border-box;
+				color: #999999;
+			}
+			
+			.input:focus {
+				border-color: #66afe9;
+				outline: 0;
+				-webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(102, 175, 233, .6);
+				box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(102, 175, 233, .6);
+			}
+			
+			.text-center {
+				text-align: center;
+			}
+			
+			.button {
+				cursor: pointer;
+				margin-left: 5px;
+				padding: 5px 10px;
+				border-radius: 2px;
+				color: #FFFFFF;
+				font-size: 14px;
+				font-weight: bold;
+				background-color: #01ace2;
+				border: none;
+			}
+			
+			.button:active,
+			.button:focus {
+				border: none;
+				outline: none;
+			}
+			
+			.button:hover {
+				background-color: #11bcf2;
+			}
+			
+			.button.disabled,
+			.button:disabled {
+				cursor: not-allowed;
+				background: #eee;
+			}
+			
+			.zip-download-tip {
+				display: inline-block;
+				vertical-align: middle;
+				margin-left: 10px;
+				color: #f60;
+			}
+			
+			.action {
+				line-height: 30px;
+			}
+			
+			.add-fav {
+				float: right;
+				margin-right: 20px;
+				text-decoration: none;
+				color: #069823;
+				font-size: 16px;
+				transition: all linear .2s;
+			}
+			
+			.add-fav:hover {
+				color: #16de3e;
+			}
+			
+			.mfile-bar-con {
+				margin-top: 2px;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div id="left_area" style="margin:0px auto;width:90%;float: none;" class="container_lv1">
+			<form class="config-form" id="configForm">
+				<h3>图片压缩工具配置项<span>填写后再选择文件时生效</span></h3>
+				<table class="config-table">
+					<tr>
+						<td class="label">最大宽度：</td>
+						<td><input class="input" min="0" type="number" name="width" /><span class="input-tip">px</span></td>
+
+						<td class="label">图片质量：</td>
+						<td><input class="input" step="0.1" min="0" max="1" type="number" name="quality" /><span class="input-tip">0-1</span></td>
+					</tr>
+					<tr>
+						<td class="label">最大高度：</td>
+						<td><input class="input" min="0" type="number" name="height" /><span class="input-tip">px</span></td>
+						<td class="label">缩放比例：</td>
+						<td><input class="input" step="0.1" min="0" max="1" type="number" name="scale" /><span class="input-tip">0-1</span></td>
+					</tr>
+				</table>
+				<div style="margin-left: 20px;"><button id="zip-download" type="button" class="button">打包下载</button><span class="zip-download-tip"></span>
+					<a href="javascript:void(0)" onclick="addFavorite()" class="add-fav">收藏工具</a>
+				</div>
+			</form>
+			<fieldset id="left_fieldset" class="container_lv2">
+				<!--<legend align="right" style="margin-right:30px;">候选文件</legend>-->
+				<div id="left_panel" class="container_lv3">
+				</div>
+			</fieldset>
+			<div id="bl_area">
+				<div id="bl_fieldset" class="container_lv2">
+					<div id="bl_panel" class="container_lv3">
+						<div id="info_label">选择或拖放文件</div>
+						<a id="left_clear" class="action">清空</a>
+						<button id="select_button"><img src="img/select.png"/>选择...</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+	</body>
+
+</html>
