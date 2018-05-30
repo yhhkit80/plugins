@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title>附件模板审批展示demo</title>
+		<!-- 图片预览加载viewer插件的css和js文件 -->
+		<link href="../js/viewer-0.5.0.min.css" rel="stylesheet">
+		<link href="../css/imgview.css" rel="stylesheet">
+		<script src="../js/jquery-2.2.1.min.js" charset="UTF-8"></script>
+		<script src="../js/viewer-0.5.0.min.js" charset="UTF-8"></script>
+	</head>
+
+	<body>
+		<div class="body-container">
+			<div id="bigContainer"></div>
+		</div>
+		<div class="page-bottom-tool hidden">
+			<a href="javascript:saveResult()" class="img-button">保 存</a>
+		</div>
+		<script type="text/javascript">
+			var _LoadingHtml = '<div id="loadingDiv" style="position:absolute;left:0;width:100%;height:100%;top:0;background:#f8f8f8;opacity:1;filter:alpha(opacity=100);z-index:10000;display: flex;justify-content: center;align-items: center;width: 100%;">' +
+				'<div style="cursor: wait;position:absolute;top:50%;left:50%;margin-left:-80px;margin-top:-28px; width:160px; height: 56px; line-height: 56px; padding-left: 50px; background: #fff url(../img/loading.gif) no-repeat scroll 5px 12px; border: 1px solid #eeeeee; color: #696969; font-family:\'Microsoft YaHei\';">玩命加载中...</div></div>';
+			document.write(_LoadingHtml);
+			document.onreadystatechange = function() {
+				if(document.readyState == "complete") {
+					var loadingMask = document.getElementById('loadingDiv');
+					loadingMask.parentNode.removeChild(loadingMask);
+				}
+			}
+			//以上为页面加载时loading效果  （不是ajax请求时的效果）
+
+			//获取url参数的方法
+			function getparam() {
+				var query = location.search.substring(1);
+				var values = query.split("&"); //字符串分隔
+				var param = {};
+				for(var i = 0; i < values.length; i++) {
+					var pos = values[i].indexOf('=');
+					if(pos == -1) continue;
+					var paramname = values[i].substring(0, pos);
+					var value = values[i].substring(pos + 1);
+					param[paramname] = decodeURIComponent(value);
+				}
+				return param; //返回参数对象
+			};
+
+			//使用图片预览插件时先获取数据
+			function getPluginImg() {
+				alert('父页面传参：' + JSON.stringify(getparam())); //接收父页面参数
+				$.ajax({
+					url: '../json/templatedata.json',
+					type: "get",
+					data: {}, //请求时带上父页面参数
+					dataType: 'json',
+					success: function(data) {
+						if(data.respCode != '0000') {
+							$(document.body).empty();
+							alert(data.respMsg);
+							return;
+						}
+						$('.page-bottom-tool').removeClass('hidden');
+						delete data.respCode;
+						delete data.respMsg;
+						$('#bigContainer').data('data', data) //存放请求的模板数据，用于审批时保存对应修改的值
+						renderPluginImg(data); //渲染列表
+					},
+					error: function(jqXHR, textStatus, errorThrown) {
+						alert("服务器错误，" + jqXHR.status);
+					}
+				});
+			}
+			//渲染图片预览插件图片列表
+			function renderPluginImg(data) {
+				var $container = $('#bigContainer');
+				$container.empty();
+				$.each(data.categories, function(i, item) {
+					var classesHtml = ''
+					$.each(item.classes, function(j, row) {
+						classesHtml += '<div data-position="' + ('' + i + '_' + j) + '"  class="img-container">' +
+							'<div class="img-content">' +
+							'<div class="img-preview">' +
+							'<img src-original="' + (row.imagePic ? ('http://192.168.88.216/' + row.imagePic) : '') + '" src="' + (row.imagePic ? ('http://192.168.88.216/' + row.imagePic) : '') + '" />' +
+							'</div>' +
+							'<div class="img-title-box">' +
+							'<a>' + (row.title || '无标题') + '</a>' +
+							'</div>' +
+							'<div class="img-selftoolbar">' +
+							'<a class="selftool-refuse ' + (row.mark == '1' ? 'hidden' : '') + '" title="退回"></a>' +
+							'<a class="selftool-pass ' + (row.mark != '1' ? 'hidden' : '') + '" title="取消退回"></a>' +
+							'</div>' +
+							'<div class="img-flag ' + (row.mark == '1' ? 'refused' : '') + '">' +
+							'</div>' +
+							'</div>' +
+							'</div>'
+					})
+					var cate = '<div class="list-block">' +
+						'<div class="category-title-box">' +
+						'<span class="cate-sign">' + (i + 1) + '</span>' +
+						'<span class="category-title">' + (item.categoryTitle || '无大类标题') + '</span>' +
+						'</div>' +
+						'<div class="img-container-wrapper">' + classesHtml + '</div>';
+					$container.append(cate);
+				})
+				//数据渲染成功后初始化图片查看插件
+				var viewer = new Viewer(document.getElementById('bigContainer'), {
+					url: 'src-original', //大图的图片链接对应img中的属性名称
+					show: function(r) { //第一次打开显示大图时
+						if($('.viewer-selftoolbar').length == 0) {
+							$('.viewer-toolbar').before('<div class="viewer-selftoolbar"><a class="selftool-refuse hidden">退回</a><a class="selftool-pass hidden">取消退回</a></div>')
+							$('.viewer-container').append('<div class="img-flag"></div>')
+						}
+					},
+					view: function(r) {
+						//显示每张图片时 图片所占序号, 图片标签的属性
+						//console.log(r.detail.index,r.detail.image.attributes) 
+						var $box = $('.img-container', '#bigContainer').eq(r.detail.index);
+						var ps = $box.attr('data-position');
+						$('.viewer-canvas').attr('data-position', ps || '');
+						$('.viewer-title').text($('.img-title-box a', $box).text());
+						if($('.img-flag', $box).hasClass('refused')) {
+							$('.viewer-container .img-flag').addClass('refused')
+							$('.selftool-refuse', '.viewer-selftoolbar').addClass('hidden');
+							$('.selftool-pass', '.viewer-selftoolbar').removeClass('hidden');
+						} else {
+							$('.viewer-container .img-flag').removeClass('refused')
+							$('.selftool-refuse', '.viewer-selftoolbar').removeClass('hidden');
+							$('.selftool-pass', '.viewer-selftoolbar').addClass('hidden');
+						}
+					},
+				});
+			}
+			//切换单张图片审核状态，修改数据中的mark值
+			function todoChange(pos, type) {
+				var mark = type == 'refuse' ? '1' : '0';
+				var $cont = $('.img-container[data-position="' + pos + '"]');
+				$('.img-flag', $cont).attr('class', 'img-flag ' + (type == 'refuse' ? 'refused' : ''))
+				$('.selftool-' + (mark == '1' ? 'pass' : 'refuse'), $cont).removeClass('hidden').siblings().addClass('hidden');
+				var posArr = pos.split('_');
+				var initData = $('#bigContainer').data('data');
+				initData.categories[posArr[0]].classes[posArr[1]].mark = mark;
+				$('#bigContainer').data('data', initData);
+			}
+			//保存
+			function saveResult() {
+				var initData = $('#bigContainer').data('data');
+				//提交审批后的数据
+				console.log(JSON.stringify(initData));
+				//这里添加提交服务器的方法
+				//提交成功后向父页面发送消息，写在提交成功的方法里面
+				if(window.top != window.self) { //iframe嵌套方式
+					window.parent.postMessage("子页面：doFinished", '*');
+				} else { //新窗口打开方式
+					window.opener.postMessage("子窗口：doFinished", '*');
+					//window.close();
+				}
+			}
+			$(function() {
+				getPluginImg(); //执行数据初始化
+				//小按钮操作事件绑定
+				$(document.body).on('click', '.viewer-selftoolbar .selftool-refuse', function(e) {
+					var pos = $('.viewer-canvas').attr('data-position');
+					$('.viewer-container .img-flag').addClass('refused');
+					$('.selftool-refuse', '.viewer-selftoolbar').addClass('hidden');
+					$('.selftool-pass', '.viewer-selftoolbar').removeClass('hidden');
+					todoChange(pos, 'refuse')
+				})
+				$(document.body).on('click', '.img-selftoolbar .selftool-refuse', function(e) {
+					var pos = $(this).parents('.img-container').attr('data-position');
+					todoChange(pos, 'refuse')
+				})
+				$(document.body).on('click', '.viewer-selftoolbar .selftool-pass', function(e) {
+					var pos = $('.viewer-canvas').attr('data-position');
+					$('.viewer-container .img-flag').removeClass('refused');
+					$('.selftool-refuse', '.viewer-selftoolbar').removeClass('hidden');
+					$('.selftool-pass', '.viewer-selftoolbar').addClass('hidden');
+					todoChange(pos, 'pass')
+				})
+				$(document.body).on('click', '.img-selftoolbar .selftool-pass', function(e) {
+					var pos = $(this).parents('.img-container').attr('data-position');
+					todoChange(pos, 'pass')
+				})
+			})
+		</script>
+	</body>
+
+</html>

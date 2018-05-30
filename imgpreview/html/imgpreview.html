@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title>附件模板审批展示demo</title>
+		<!--<script type="text/javascript" src="../../../RESTon.js"></script>-->
+		<script type="text/javascript" src="../js/jquery-2.2.1.min.js"></script>
+		<style>
+			a.oper-btn {
+				padding: 5px 10px;
+				margin-right: 10px;
+				background: #0099FF;
+				color: #FFFFFF;
+				font-size: 18px;
+				border-radius: 5px;
+				opacity: .9;
+			}
+			
+			a.oper-btn:hover {
+				opacity: 1;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div style="margin: 20px;font-size:16px;line-height: 1.5;">
+			<p>
+				iframe加载：使用iframe嵌套url链接地址，支持IE9及以上, chrome, firefox浏览器；<br />
+				新窗口加载：使用window.open()方法打开url地址，支持IE9及以上, chrome, firefox浏览器；<br />
+				postMessage()向父页面传递消息：<br />
+				&nbsp;&nbsp;iframe加载时----支持IE9及以上, chrome, firefox浏览器。<br />
+				&nbsp;&nbsp;新窗口加载时----支持chrome/firefox浏览器,跨域时IE不支持该方法(获取不到window.opener)，同域时仅IE10及以上支持。
+			</p>
+		</div>
+		<div style="margin: 20px;">
+			<a href="javascript:openWin()" class="oper-btn">用新窗口加载</a>
+			<a href="javascript:addIframe()" class="oper-btn">用iframe加载</a>
+		</div>
+		<script type="text/javascript">
+			window.addEventListener('message', function(event) {
+				if(event.data) {
+					alert(event.data); //接收子页面或子页面点击保存后发送的数据;
+				}
+			});
+			//用iframe加载
+			function addIframe() {
+				if($('#iframe').length == 0) {
+					var iframe = $('<iframe id="iframe" scrolling="auto" frameborder="0" style="display:block;margin:0 auto;width:90%;height:600px;"></iframe>');
+					$(document.body).append(iframe);
+					var params = {
+						templateID: '5302DEB21C5289ACE0530401A8C06417',
+						bussID: ''
+					}
+					var searchParams = '?templateID=' + params.templateID + '&bussID=' + params.bussID
+					iframe.attr('src', './imgpreviewreal.html' + searchParams);
+					//iframe.attr('src', 'http://127.0.0.1:8020/homepage/demo/imgpreview/html/imgpreviewreal.html' + searchParams);
+				}
+			}
+			//用新窗口加载
+			function openWin() {
+				var params = {
+					templateID: '5302DEB21C5289ACE0530401A8C06417',
+					bussID: ''
+				}
+				var searchParams = '?templateID=' + params.templateID + '&bussID=' + params.bussID
+				var popupwin = window.open("./imgpreviewreal.html" + searchParams, "Map", "status=0,title=0,height=700,width=700,scrollbars=1");
+				//var popupwin = window.open("http://127.0.0.1:8020/homepage/demo/imgpreview/html/imgpreviewreal.html" + searchParams, "Map", "status=0,title=0,height=700,width=700,scrollbars=1");
+			}
+		</script>
+	</body>
+
+</html>

@@ -14,4 +14,6 @@ io: 图片压缩工具
 
 scrollNotice: 滚动通知demo  
 compass: 分数罗盘demo  
+
 json_schema: 将schema定义的内容在页面中以json加注释形式显示  
+imgpreview: 附件模板展示并审批
